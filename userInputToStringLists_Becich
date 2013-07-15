@@ -44,16 +44,16 @@ def inputReactions(inputName):
                     outputFreq=value
                 break   
     molVSList = []
-    stList = optionalParams[3].strip('., ').split()
+    stList = optionalParams[3].replace(',','').replace('.','').split()
+    print stList
     test=False
     for i in range(len(stList)):
         if(stList[i] =="vs"):
             molVSList.append((stList[i-1],stList[i+1]))
-            test=true
+            test=True
     if(test):
         return (rxnsAndMolCounts, duration, maxIterations, outputFreq, molVSList)
     else:
         return (rxnsAndMolCounts, duration, maxIterations, outputFreq, None)
-
+#TODO - Must check that all plot requests are in molCounts!
 #print inputReactions("test1")
-
