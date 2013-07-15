@@ -1,0 +1,43 @@
+print "Welcome to -------!"
+print "Instructions for file format"
+print "Ex: CO2 + H2O -> C6H12O6 + O2"
+print "- NO spaces"
+print "- NO > + - * / in molecule name"
+print "- First character of each molecule must be a letter"
+print "- If first character is a number, it will be treated as a coefficient"
+print "- All numbers must be integers"
+print "- Numbers within molecule name are OK"
+print "- Lowercase is OK"
+print "- Save file in the same folder as the ------.py"
+print "First please customize input.txt with your reactions, molecules, and preferences"
+
+input = open("input1.txt")
+reactions_list=[]
+def inputReactions(input):
+    file = open(input, 'r')
+    in_reaction_block = False
+    for line in file.readlines():
+
+        if len(line) == 0:
+            continue
+
+        if line[0] == "#":
+            continue
+
+        line = line.strip()
+
+        if line == "Reactions" or line == "Molecule Count of Reactants" or line == "Optional Parameters" or line == "Output Format":
+            in_reaction_block = True
+            continue
+
+        if line == "end":
+            if in_reaction_block == True:
+                in_reaction_block = False
+        
+        if in_reaction_block:
+            reactions_list.append(line)
+            continue
+
+inputReactions("input1.txt")
+
+print reactions_list
