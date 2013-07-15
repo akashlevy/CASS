@@ -1,0 +1,39 @@
+#Welcome to ------!
+#Instructions for file format
+#Ex: CO2+H2O->C6H12O6+O2
+#- NO spaces
+#- NO > + - * / in molecule name
+#- First character of each molecule must be a letter
+#- If first character is a number, it will be treated as a coefficient
+#- All numbers must be integers
+#- Numbers within molecule name are OK
+#- Lowercase is OK
+#- Save this file in the same folder as the ----.py
+
+
+#***Replace the quantities below with your reactions and rate constants:
+Reactions
+(Reactant1)+(Reactant2)+(Reactant3)+(...)->(Product1)+(Product2)+(Product3)+(...)_(rate constant)
+(Reactant4)+(Reactant5)+(Reactant6)+(...)->(Product4)+(Product5)+(Product6)+(...)_(rate constant)
+end
+
+#***Replace the quantities below with reactant names and their corresponding initial molecule count:
+Molecule Count of Reactants
+(Reactant1) = (Insert Molecule Count #)
+(Reactant2) = (Insert Molecule Count #)
+(Reactant3) = (Insert Molecule Count #)
+end
+
+
+Optional Parameters
+duration=(Insert Duration) default = 30 sec
+time_step=(Insert TimeStep) default = 
+output_freq=(Insert Output Frequency) default = 
+end
+
+
+Output Format
+(Reactant1) molecule counts saved in "(Reactant1).dat"
+(Reactant2) molecule counts saved in "(Reactant1).dat"
+(Reactant3) molecule counts saved in "(Reactant1).dat"
+end
