@@ -3,7 +3,6 @@ import os.path
 import os
 
 def inputReactions(inputName):
-    directory = os.path.dirname(os.path.realpath(inputName))# OR os.getcwd()
     file = open("%s.txt"%(inputName), 'r')
     strList = file.readlines()
     index=0
@@ -52,11 +51,8 @@ def inputReactions(inputName):
             molVSList.append((stList[i-1],stList[i+1]))
             test=True
     if(test):
-        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, molVSList, directory)
+        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, molVSList, inputName)
     else:
-        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, None, directory)
+        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, None, inputName)
 #TODO - Must check that all plot requests are in molCounts!
 #print inputReactions("test1")
-
-
-
