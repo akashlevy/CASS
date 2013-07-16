@@ -1,9 +1,10 @@
 import sys
+import os.path
 import os
 
 def inputReactions(inputName):
+    directory = os.path.dirname(os.path.realpath(inputName))# OR os.getcwd()
     file = open("%s.txt"%(inputName), 'r')
-    #directory = os.path.dirname(os.path.abspath(file))# OR os.getcwd()
     strList = file.readlines()
     index=0
     rxnsAndMolCounts = []
@@ -45,15 +46,17 @@ def inputReactions(inputName):
                 break   
     molVSList = []
     stList = optionalParams[3].replace(',','').replace('.','').split()
-    print stList
     test=False
     for i in range(len(stList)):
         if(stList[i] =="vs"):
             molVSList.append((stList[i-1],stList[i+1]))
             test=True
     if(test):
-        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, molVSList)
+        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, molVSList, directory)
     else:
-        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, None)
+        return (rxnsAndMolCounts, duration, maxIterations, outputFreq, None, directory)
 #TODO - Must check that all plot requests are in molCounts!
 #print inputReactions("test1")
+
+
+
