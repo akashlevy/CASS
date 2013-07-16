@@ -1,4 +1,4 @@
-import math, numpy, pylab, sys, random as rng
+import math, os, numpy, pylab, sys, random as rng
 
 #Data Structure
     #"tupleInputs" = list of Tuples (each tuple represents a reaction)
@@ -7,19 +7,36 @@ import math, numpy, pylab, sys, random as rng
         #2-"coeffs"=dictionary of ("Molecule Name":coefficient of REACTANTS)
     #"molCounts" = dictionary of ("Molecule Name":Provided intial number of each molecule)
 
-def updateAll(tupleInputs, molCounts): #List of Tuples, dictionary of molecule counts
+def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, inputName): #List of Tuples, dictionary of molecule counts
+##    directory=os.path.dirname(path.realpath(inputName))#Akash I need your help with directories
+##    
+##    =(r""+directory + "_Results_%s"%(str(datetime.datetime.now())))#ADDS DATE/TIME TO Folder Name, later stores all results in folder
+##    try:
+##        os.mkdir()
+##    except OSError as exc: 
+##        if exc.errno == errno.EEXIST and os.path.isdir(path):
+##            pass
     rng.seed(124213)
     time       = 0.0
-    iteration  = 0                               #Iteration count (TO DO - make this a parameter)
-    outputFreq = 1000                            #Output frequency (TO DO - make this a parameter)
-    updaters   = []
-    maxTime = 10
-    maxIterations = 1000000
+    iteration  = 0
 
-    #Open output files
+    #Prints parameters
+    print "Maximum Time: ",maxTime
+    print "Maximum number of Iterations: ", maxIterations
+    print "Output Frequency: ", outputFreq
+    print "Input File Name: ", inputName
+    print "Plots: ",
+    for vs in molVSList:
+        print "%s vs. %s,"%(vs[0],vs[1]),
+    print "\n------------------"
+    print "Processing..."
+    print "------------------"
+    
+    
+    # open output files
     fileHandles = open_output_files(molCounts)
-    loop=True
-    while(time < maxTime and iteration < maxIterations and loop):
+
+    while(time < maxTime and iteration < maxIterations):
         props = []
         for i in range(len(tupleInputs)): #len(tupleInputs) is the number of reactions
             prop = computePropensity(tupleInputs[i],molCounts)
@@ -35,39 +52,32 @@ def updateAll(tupleInputs, molCounts): #List of Tuples, dictionary of molecule c
         while(threshold > summation):
             summation += props[count]
             count += 1
-        rxnChoice = tupleInputs[count-1][1] #Dictionary of change in coefficients (Key = Molecule Name)
+        rxnChoice = tupleInputs[count-1][1] #Dictionary of change in coefficients (Key=Molecule Name)
         molCounts = reactionUpdater(rxnChoice,molCounts)
         if (iteration % outputFreq == 0):
             tempTime= time
             write_data_to_output(fileHandles, time, molCounts)
             print "iteration %d   time %5.4g" % (iteration, time)   
         iteration += 1
-        loop = (isNotZero(molCounts))
     close_output_files(fileHandles)
-    graphResults(fileHandles,molCounts)
+    if(molVSList!=None):
+        graphResults2(fileHandles,molCounts,molVSList,"outFile")
     
     print "Simulation Complete - Check Folder for files"
 
-#Checks to see if any of the molecules have reached a zero count (TODO - We need to decide what happens when this occurs)
-def isNotZero(molCounts):
-    bool1=True
-    for num in molCounts:
-        if(num==0):
-            bool1=False
-    return bool1
 
-#Takes one tuple and returns propensity based on algorithm   
+#takes one tuple and returns propensity based on algorithm   
 def computePropensity(tupleInput, molCounts):
-    kVal = tupleInput[0]#K-value
-    coeffs = tupleInput[2] #Dictionary of coefficients for each molecule REACTANTS ONLY (Key = Molecule Name)
+    kVal=tupleInput[0]# k value
+    coeffs=tupleInput[2] #Dictionary of coefficients for each molecule REACTANTS ONLY(Key=Molecule Name)
     num = len(coeffs)
-    propProduct = kVal #Initialized to k-value
+    propProduct=kVal # initialized to k value
     for key in coeffs:
         try:
-            propProduct *= calcNPR(molCounts[key],coeffs[key])*(1.0/(coeffs[key])) #Multiplied by permutation of molCounts for each reactant molecule divided by the coefficient
+            propProduct *= calcNPR(molCounts[key],coeffs[key])*(1.0/(coeffs[key])) # multiplied by permutation of molCounts for each reactant molecule divided by the coefficient
             break
         except KeyError:
-            raise ParsingSyntaxError("ERROR: %s is not in the molecule list" %(key))
+            print "ERROR - %s is not in the molecule list"%(key) # REPLACE WITH RAISE ERROR
             sys.exit(1)
     return propProduct
 
@@ -80,18 +90,11 @@ def calcNPR(n,r):
         r-=1
     return product
 
-def perm(n):
-    x=1
-    product=x
-    while(x<=n):
-        product=product*x
-        x+=1
-    return product
-
 #Takes one dictionary of a reaction and adds the difference for each molecule according to the reaction
 def reactionUpdater(rxn,molCounts):
     for key in rxn:
         if(key in molCounts.keys()):
+            #print molCounts[key], ", ", rxn[key]
             molCounts[key]+=rxn[key]
         else:
             print "ERROR - %s Molecule not Found"%(key)
@@ -118,30 +121,25 @@ def close_output_files(fileHandles):
     for i in range(0,len(fileHandles)):
         fileHandles[i].close()
 
-#Graphs all combinations and creates output files --> C(n,2) total plots)
-def graphResults(fileHandles,molCounts):
+def graphResults2(fileHandles, molCounts, molVSList, OFdirectory):
     fileNames = []
-    directoryName="C:\Users\Admin\Documents\MIKEY\Mike's School Docs\Extracurricular\Summer 2013 - PGSS\PGSS-CS\Biochemical Stochastic Simulator\Tests"
-    for key in molCounts.keys():
-        fileNames.append("%s.dat"%key)
-    for i in range(len(fileNames)):
-        for j in range(i+1,len(fileNames)):
-            if(fileNames[i] !=fileNames[j]):
-                listx=readIn(fileNames[i])
-                listy=readIn(fileNames[j])
-                xN=fileNames[i].replace(".dat","")
-                yN=fileNames[j].replace(".dat","")
-                pylab.plot(listx,listy)
-                title1="%s vs. %s"%(xN,yN)
-                pylab.title(title1)
-                pylab.xlabel("%s Population"%(xN))
-                pylab.ylabel("%s Population"%(yN))
-                fig = pylab.gcf()
-                fig.canvas.set_window_title('Adaptable Stochastic Simulator')
-                #fig.savefig(("%s%s.plot"%(directoryName,title1)),dpi=100) #TO DO - Does not save properly
-                pylab.show()
-                pylab.close()
-
+    for i in range(len(molVSList)):
+        xN=molVSList[i][0]
+        yN=molVSList[i][1]
+        listx=readIn("%s.dat"%xN)
+        listy=readIn("%s.dat"%yN)
+        title1="%s vs. %s"%(xN,yN)
+        pylab.plot(listx,listy)
+        pylab.title(title1)
+        pylab.xlabel("%s Population"%(xN))
+        pylab.ylabel("%s Population"%(yN))
+        fig = pylab.gcf()
+        fig.canvas.set_window_title('Adaptable Stochastic Simulator')
+        fig.savefig(("%s_Plot.png"%(title1)),dpi=100) ##TO DO-Add outfile directory
+        pylab.show()
+        pylab.close()
+        
+                
 #Reads the created files for plotting
 def readIn(fileName):
     list1=[]
@@ -161,6 +159,7 @@ def main():
     #(kVal,{Dictionary of DifferenceValues - "Molecule Name":Difference},Dictionary of DifferenceValues - "Molecule Name":Difference})
     tupleInputsEx2= (5,{"A":-1,"Y":-1,"X":1,"P":1},{"A":1,"Y":1}),(3,{"X":-1,"Y":-1,"P":2},{"X":1,"Y":1}),(10,{"A":-1,"X":1,"Z":2},{"A":1,"X":1}),(20,{"X":-2,"A":1,"P":1},{"X":2,"A":1,"P":1}),(.7,{"B":-1,"Z":-1,"Y":1},{"B":1,"Z":1}),
     molCountsEx2 = {"A":100,"B":100,"X":200,"Y":200,"Z":100,"P":100}
-    updateAll(tupleInputsEx, molCountsEx)
+
+    updateAll(tupleInputsEx, molCountsEx, 10, 100000, 1000,(('R','W'),('W','R')), "test1")
     
 main()
