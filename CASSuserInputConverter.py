@@ -54,5 +54,8 @@ def inputReactions(inputName):
         return (rxnsAndMolCounts, duration, maxIterations, outputFreq, molVSList, inputName)
     else:
         return (rxnsAndMolCounts, duration, maxIterations, outputFreq, None, inputName)
+
 #TODO - Must check that all plot requests are in molCounts!
 #print inputReactions("test1")
+
+
