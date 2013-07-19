@@ -12,7 +12,7 @@ class ParsingSyntaxError(Exception):
         sys.exit(1)
 
 #Some working test strings
-testStrings = ['Akash = 0','Akash + 12Darn -> Fub [-1.33]','4B + D -> A [1.44]','C + 3A -> 2B [1.68]','A = 40','B = 20','C = 10','D = 5']
+#testStrings = ['Akash = 0','Akash + 12Darn -> Fub [-1.33]','4B + D -> A [1.44]','C + 3A -> 2B [1.68]','A = 40','B = 20','C = 10','D = 5']
 
 #Text parsing function
 def parseText(inputStrings):
@@ -71,7 +71,7 @@ def parseText(inputStrings):
         eqEndMatches = list(re.finditer(regExpEqEnd, line, re.VERBOSE))
         eqConstantMatches = list(re.finditer(regExpEqConstant, line, re.VERBOSE))
         declarationMatches = list(re.finditer(regExpDeclaration, line, re.VERBOSE))
-
+        
         #Check for errors
         if len(eqArrowMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one arrow in line " + str(i) + ":\n" + line)        
@@ -101,16 +101,16 @@ def parseText(inputStrings):
                     coefficient = int(match.group(1))
                 elementName = match.group(2)
                 if match.start() < eqSplitter:
-                    if coefficient in reactants:
+                    if elementName in reactants:
                         raise ParsingSyntaxError("ERROR: The parser found more than one of the same reactant in line " + str(i) + ":\n" + line)
                     else:
                         products[elementName] = 0
                         reactants[elementName] = coefficient
                 elif match.start() >= eqSplitter:
-                    if coefficient in products:
-                        raise ParsingSyntaxError("ERROR: The parser found more than one of the same product in line " + str(i) + ":\n" + line)
+                    if elementName in products and products[elementName] != 0:
+                            raise ParsingSyntaxError("ERROR: The parser found more than one of the same product in line " + str(i) + ":\n" + line)
                     else:
-                        if not coefficient in reactants:
+                        if not elementName in reactants:
                             reactants[elementName] = 0
                         products[elementName] = coefficient
             for reactant in reactants.keys():
@@ -122,7 +122,8 @@ def parseText(inputStrings):
             moleCounts[elementName] = moleCount
     return equations, moleCounts
         
-equations, moleCounts = parseText(testStrings)
-print equations
-print moleCounts
-''''''
+##equations, moleCounts = parseText(testStrings)
+##print equations
+##print moleCounts
+##''''''
+
