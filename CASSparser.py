@@ -126,4 +126,3 @@ def parseText(inputStrings):
 ##print equations
 ##print moleCounts
 ##''''''
-
