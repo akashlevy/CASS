@@ -21,7 +21,7 @@ def mainCASS():
         except IOError:
             print "Error - File does not exist"
         
-    elements = userInputToStringLists.inputReactions(fileName)
+    elements = CASSuserInputConverter.inputReactions(fileName)
     #print elements
     rxnsAndMolCounts=elements[0]
     duration=elements[1]
@@ -30,7 +30,7 @@ def mainCASS():
     molVSList=elements[4]
     inputName=elements[5]
 
-    EqnsNmolCounts = parse.parseText(rxnsAndMolCounts)
+    EqnsNmolCounts = CASSparser.parseText(rxnsAndMolCounts)
     #print EqnsNmolCounts
     tupleInputs = EqnsNmolCounts[0]
     molCounts = EqnsNmolCounts[1]
