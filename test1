@@ -13,20 +13,20 @@
 
 ***Replace the quantities below with your reactions and rate constants:
 Reactions
-R+F->2R_10
-R+W->2W_.01
-2W->W_10
+R->2R [10]
+R+W->2W [.01]
+W-> [10]
 end
 
 ***Replace the quantities below with reactant names and their corresponding initial molecule count:
 Molecule Count of Reactants
-R = 1000
-W = 2000
+R = 2000
+W = 1000
 end
 
 Optional Parameters
-duration=(Insert Duration [secs]) default = 30
-max_iterations=(Insert Max Number of Iterations) default = 1000000
+duration=(Insert Duration [secs]) default = 10
+max_iterations=(Insert Max Number of Iterations) default = 100000
 output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 1000
-Plot A vs. B, B vs. A, C vs. D
+Plot R vs. W, W vs. R
 end
