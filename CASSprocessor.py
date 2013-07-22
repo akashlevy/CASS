@@ -10,7 +10,7 @@ import math, os, numpy, pylab, sys, datetime, random as rng
 def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, inputName): #List of Tuples, dictionary of molecule counts
     append=str(datetime.datetime.now()).replace(" ","_").replace(".","").replace(":","")
     os.mkdir(r"%s_%s"%("Results",append))
-    rng.seed(124213)# Change 1 for multiple trials
+    rng.seed(124213)
     time       = 0.0
     iteration  = 0
 
@@ -36,7 +36,9 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
         props = []
         for i in range(len(tupleInputs)): #len(tupleInputs) is the number of reactions
             prop = computePropensity(tupleInputs[i],molCounts)
+            #print prop,
             props.append(prop)
+        #print "\n"
         sump = sum(props)
         rand_1 = rng.random()
         tau = (1.0/sump * math.log(1.0/rand_1))
@@ -64,7 +66,7 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
 #takes one tuple and returns propensity based on algorithm   
 def computePropensity(tupleInput, molCounts):
     kVal=tupleInput[0]# k value
-    coeffs=tupleInput[1] #Dictionary of coefficients for each molecule REACTANTS ONLY(Key=Molecule Name)
+    coeffs=tupleInput[1] #Dictionary of coefficients for each molecule REACTANTS ONLY (Key=Molecule Name)
     num = len(coeffs)
     propProduct=kVal # initialized to k value
     for key in coeffs:
@@ -81,7 +83,7 @@ def computePropensity(tupleInput, molCounts):
 #Takes two integers n and r, and returns nPr (i.e. P(n,r))
 def calcNPR(n,r):
     product=1
-    while(n>0 and r>0):
+    while(r>0):
         product*=n
         n-=1
         r-=1
@@ -92,7 +94,7 @@ def reactionUpdater(rxn,molCounts):
     for key in rxn:
         if(key in molCounts.keys()):
             #print molCounts[key], ", ", rxn[key]
-            assert(molCounts[key]>0), 'Molecule %s has ran out'%(key)
+            #assert(molCounts[key]>0), 'Molecule %s has ran out'%(key)
             molCounts[key]+=rxn[key]
         else:
             print "ERROR - %s Molecule not Found"%(key)
