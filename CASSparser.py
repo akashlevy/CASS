@@ -2,6 +2,8 @@
 import re, sys, math, numpy, pylab
 import random as rng
 
+teststrings = ['2C + B -> 3B + A [.005]']
+
 #Exception that is raised when an error is found during parsing
 class ParsingSyntaxError(Exception):
     def __init__(self, string):
@@ -93,7 +95,7 @@ def parseText(inputStrings):
                 raise ParsingSyntaxError("ERROR: The parser found more than one reaction constant in line " + str(i) + ":\n" + line)
             else:
                 constant = float(eqConstantMatches[0].group(1)) #Set the constant equal to the match that was found
-            for match in (eqPlusMatches + eqArrowMatches + eqEndMatches):
+            for match in (eqArrowMatches + eqPlusMatches + eqEndMatches):
                 #If coefficient is not found, then set it equal to one
                 if match.group(1) == '' or match.group(1) == None:
                     coefficient = 1
@@ -126,3 +128,5 @@ def parseText(inputStrings):
 ##print equations
 ##print moleCounts
 ##''''''
+
+print parseText(teststrings)
