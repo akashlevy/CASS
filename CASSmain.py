@@ -35,6 +35,6 @@ def mainCASS():
     tupleInputs = EqnsNmolCounts[0]
     molCounts = EqnsNmolCounts[1]
 
-    StochSimCompute_Becich_v4.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, inputName)
+    StochSimCompute_Becich_v5.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, inputName)
 
 mainCASS()
