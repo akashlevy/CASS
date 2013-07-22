@@ -1,5 +1,5 @@
-import parse
-import userInputToStringLists
+import CASSparser
+import CASSuserInputConverter
 import CASSprocessor
 
 def mainCASS():
@@ -38,3 +38,5 @@ def mainCASS():
     CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, inputName)
 
 mainCASS()
+
+
