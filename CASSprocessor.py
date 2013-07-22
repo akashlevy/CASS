@@ -50,9 +50,8 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
             count += 1
         rxnChoice = tupleInputs[count-1][2] #Dictionary of change in coefficients (Key=Molecule Name)
         molCounts = reactionUpdater(rxnChoice,molCounts)
+        write_data_to_output(fileHandles, time, molCounts)
         if (iteration % outputFreq == 0):
-            tempTime= time
-            write_data_to_output(fileHandles, time, molCounts)
             print "iteration %d   time %5.4g" % (iteration, time)   
         iteration += 1
     close_output_files(fileHandles)
@@ -69,12 +68,14 @@ def computePropensity(tupleInput, molCounts):
     num = len(coeffs)
     propProduct=kVal # initialized to k value
     for key in coeffs:
-        try:
-            propProduct *= calcNPR(molCounts[key],coeffs[key])*(1.0/(coeffs[key])) # multiplied by permutation of molCounts for each reactant molecule divided by the coefficient
-            break
-        except KeyError:
-            print "ERROR - %s is not in the molecule list"%(key)
-            sys.exit(1)
+        while True:
+            try:
+                if(coeffs[key]>0):
+                    propProduct *= (1.0*calcNPR(molCounts[key],coeffs[key])*(1.0/(coeffs[key]))) # multiplied by permutation of molCounts for each reactant molecule divided by the coefficient
+                break
+            except KeyError:
+                print "ERROR - %s is not in the molecule list"%(key)
+                sys.exit(1)
     return propProduct
 
 #Takes two integers n and r, and returns nPr (i.e. P(n,r))
@@ -91,6 +92,7 @@ def reactionUpdater(rxn,molCounts):
     for key in rxn:
         if(key in molCounts.keys()):
             #print molCounts[key], ", ", rxn[key]
+            assert(molCounts[key]>0), 'Molecule %s has ran out'%(key)
             molCounts[key]+=rxn[key]
         else:
             print "ERROR - %s Molecule not Found"%(key)
@@ -130,24 +132,48 @@ def close_output_files(fileHandles):
 def graphResults(fileHandles, molCounts, molVSList, append):
     fileNames = []
     if(molVSList!=None):
+        count=0
         for i in range(len(molVSList)):
             xN=molVSList[i][0]
             yN=molVSList[i][1]
-            listx=readIn("%s.dat"%xN,append)
-            listy=readIn("%s.dat"% yN,append)
+            listTime=readInTime("%s.dat"%molVSList[i][0], append)
+            if(xN.lower()=="time"):
+                print "entered"
+                listx=listTime
+            else:
+                listx=readIn("%s.dat"%xN,append) 
+            if(yN.lower()=="time"):
+                listy=listTime
+            else:
+                listy=readIn("%s.dat"% yN,append)
             title1="%s vs. %s"%(xN,yN)
-            pylab.plot(listx,listy)
             pylab.title(title1)
-            pylab.xlabel("%s Population"%(xN))
-            pylab.ylabel("%s Population"%(yN))
+            if(yN.lower()=="time"):
+                pylab.plot(listy,listx)
+                pylab.xlabel("Time")
+                pylab.ylabel("%s Population"%(xN))
+            else:
+                pylab.plot(listx,listy)
+                pylab.xlabel("%s Population"%(xN))
+                pylab.ylabel("%s Population"%(yN))
+            
             fig = pylab.gcf()
             fig.canvas.set_window_title('Computational Adaptable Stochastic Simulator')
             path = str(os.getcwd()) + "\\Results_" + append
             name =("%s_Plot_%s.png"%(title1,append))
-            fig.savefig(os.path.join(path,name),dpi=100) ##TO DO-Add outfile directory
+            fig.savefig(os.path.join(path,name),dpi=100)
             pylab.show()
             pylab.close()
-        
+            
+def readInTime(fileName, append):
+    list1=[]
+    path = str(os.getcwd()) + "\\Results_" + append
+    fileDir=os.path.join(path,fileName)
+    file = open(fileDir,"r")
+    for line in file.readlines():
+        if "Time" not in line:
+            list1.append(line.split(" ",1)[0])   
+    return list1
                 
 #Reads the created files for plotting
 def readIn(fileName, append):
