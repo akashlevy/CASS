@@ -8,7 +8,6 @@
 #print "- All numbers must be integers"
 #print "- Numbers within molecule name are OK"
 #print "- Lowercase is OK"
-#print "- Save file in the same folder as the ------.py"
 #print "First please customize input.txt with your reactions, molecules, and preferences"
 
 input = open("input1.txt")
