@@ -10,7 +10,7 @@ import math, os, numpy, pylab, sys, datetime, random as rng
 def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, inputName): #List of Tuples, dictionary of molecule counts
     append=str(datetime.datetime.now()).replace(" ","_").replace(".","").replace(":","")
     os.mkdir(r"%s_%s"%("Results",append))
-    rng.seed(124213)
+    rng.seed(124213)# Change 1 for multiple trials
     time       = 0.0
     iteration  = 0
 
