@@ -31,12 +31,11 @@ def mainCASS():
     inputName=elements[5]
 
     EqnsNmolCounts = CASSparser.parseText(rxnsAndMolCounts)
-    #print EqnsNmolCounts
+    print EqnsNmolCounts
     tupleInputs = EqnsNmolCounts[0]
     molCounts = EqnsNmolCounts[1]
 
     CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, inputName)
 
 mainCASS()
-
-
+    
