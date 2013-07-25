@@ -1,6 +1,4 @@
-import sys
-import os.path
-import os
+import sys, os.path, os
 
 def inputReactions(inputName):
     file = open("%s.txt"%(inputName), 'r')
@@ -54,8 +52,4 @@ def inputReactions(inputName):
         return (rxnsAndMolCounts, duration, maxIterations, outputFreq, molVSList, inputName)
     else:
         return (rxnsAndMolCounts, duration, maxIterations, outputFreq, None, inputName)
-
-#TODO - Must check that all plot requests are in molCounts!
-#print inputReactions("test1")
-
 
