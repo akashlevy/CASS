@@ -19,9 +19,14 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
     print "Maximum number of Iterations: ", maxIterations
     print "Output Frequency: ", outputFreq
     print "Input File Name: ", inputName
-    print "Plots: ",
-    #print molVSList
+    print "Molecules: ",
+    for key in molCounts.keys():
+        print key,
+    print "\nPlots: ",
     for vs in molVSList:
+        if((vs[0] not in molCounts and "time" not in vs[0].lower()) or vs[1] not in molCounts and "time" not in vs[1].lower()):
+                print "\nError - Plotting a variable (%s) that does not exist"%("%s vs. %s"%(vs[0],vs[1]))
+                sys.exit(0)
         print "%s vs. %s,"%(vs[0],vs[1]),
     print "\n------------------"
     print "Processing..."
@@ -40,6 +45,9 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
             props.append(prop)
         #print "\n"
         sump = sum(props)
+        if(sump==0):
+            print "All reaction propensities have reached 0."
+            break
         rand_1 = rng.random()
         tau = (1.0/sump * math.log(1.0/rand_1))
         time += tau
@@ -57,6 +65,7 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
             print "iteration %d   time %5.4g" % (iteration, time)   
         iteration += 1
     close_output_files(fileHandles)
+    test = True
     if(molVSList!=None):
         graphResults(fileHandles,molCounts,molVSList,append)
     
@@ -138,13 +147,15 @@ def graphResults(fileHandles, molCounts, molVSList, append):
         for i in range(len(molVSList)):
             xN=molVSList[i][0]
             yN=molVSList[i][1]
-            listTime=readInTime("%s.dat"%molVSList[i][0], append)
-            if(xN.lower()=="time"):
-                print "entered"
+            j=0
+            while("time" in molVSList[i][j]):
+                j+=1
+            listTime=readInTime("%s.dat"%molVSList[i][j], append)
+            if("time" in xN.lower()):
                 listx=listTime
             else:
                 listx=readIn("%s.dat"%xN,append) 
-            if(yN.lower()=="time"):
+            if("time" in yN.lower()):
                 listy=listTime
             else:
                 listy=readIn("%s.dat"% yN,append)
@@ -158,7 +169,7 @@ def graphResults(fileHandles, molCounts, molVSList, append):
                 pylab.plot(listx,listy)
                 pylab.xlabel("%s Population"%(xN))
                 pylab.ylabel("%s Population"%(yN))
-            
+            #x=numpy.arange(0,
             fig = pylab.gcf()
             fig.canvas.set_window_title('Computational Adaptable Stochastic Simulator')
             path = str(os.getcwd()) + "\\Results_" + append
@@ -187,3 +198,4 @@ def readIn(fileName, append):
         if "Time" not in line:
             list1.append(line.split(" ",1)[1])   
     return list1
+
