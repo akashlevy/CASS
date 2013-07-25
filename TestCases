@@ -1,0 +1,59 @@
+2A -> 2A
+B -> C
+2C + B -> 3B + A
+
+2B -> B + A
+A + B -> 2B + C
+C -> 2C
+
+2D -> 3F
+N + M -> L
+2L -> 3Z + 2O
+F -> 2N
+10Z -> D
+9O + 4N -> 3M + 11O
+
+--------------------------Already Tested
+
+J/Q -> 3M
+J/3P -> N + M
+M*2PQ -> 5N
+
+R**2 -> S
+-3R**2 -> 3S
+(-3R)**2 -> 9S
+
+#for pi insert symbol
+
+pi*T + W -> 2W + U
+3U - 2T -> V
+
+2pi + C -> 3B
+2B - A -> 2A + C
+
+2.5B -> B + A
+A + B -> 2B + C
+C -> 2C
+
+5B/2 -> B + A
+A + B -> 2B + C
+C -> 2C
+
+2B -> b + A
+A + B -> C
+
+B + B -> 2A + C
+A + B -> 2B + C
+C -> 2C
+
+2B +  -> B + A
+A + B -> 2B + C
+C -> 2C
+
+h2so4 + naoh -> co2 + h2o
+2h20 + 2h -> 2h3o
+co2 -> c + 2o
+
+H2SO4 + NaOH -> CO2 + H2O
+2H2O + 2H+ -> 2H3O+
+CO2 -> C + 2O-
