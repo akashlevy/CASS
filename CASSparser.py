@@ -124,9 +124,3 @@ def parseText(inputStrings):
             moleCounts[elementName] = moleCount
     return equations, moleCounts
         
-##equations, moleCounts = parseText(testStrings)
-##print equations
-##print moleCounts
-##''''''
-
-print parseText(teststrings)
