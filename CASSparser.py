@@ -2,7 +2,7 @@
 import re, sys, math, numpy, pylab
 import random as rng
 
-teststrings = ['2C + B -> 3B + A [.005]']
+testStrings = ['3h2o + Q -> 3M','J/3P -> N + M [0.005]','M*2P + Q -> 5N [0.005]']
 
 #Exception that is raised when an error is found during parsing
 class ParsingSyntaxError(Exception):
@@ -16,6 +16,27 @@ class ParsingSyntaxError(Exception):
 #Some working test strings
 #testStrings = ['Akash = 0','Akash + 12Darn -> Fub [-1.33]','4B + D -> A [1.44]','C + 3A -> 2B [1.68]','A = 40','B = 20','C = 10','D = 5']
 
+def notAllMatched(inputString, matches):
+    found = [False]*len(inputString)
+    allFound = []
+    for match in matches:
+        for i in range(match.start(), match.end()):
+            found[i] = True
+    i = 0
+    while i < len(found):
+        characterThere = found[i]
+        if not characterThere:
+            startPos = i
+            while (not characterThere) and (i < len(inputString)):
+                i+=1
+                characterThere = found[i]
+                
+            endPos = i
+            errorString = inputString[startPos:endPos]
+            allFound.append([startPos, endPos, errorString])
+        i+=1
+    return allFound           
+    
 #Text parsing function
 def parseText(inputStrings):
     #Define lists and dictionaries we want to return
@@ -26,23 +47,26 @@ def parseText(inputStrings):
     regExpEqPlus = """
     (\d*)                           #Find integers
     \s*                             #Ignore whitespaces
-    ([^\d\s\+>\-]+)                 #Read characters as word until digit, whitespace or symbol (+,-,=,>)
+    ([^\s\+>\-]+)                   #Read characters as word until digit, whitespace or symbol (+,-,=,>)
     \s*                             #Ignore whitespaces
     \+                              #Find +
+    \s*                             #Find trailing whitespaces
     """
     regExpEqArrow = """
     (\d*)                           #Find integers
     \s*                             #Ignore whitespaces
-    ([^\d\s\+>\-]+)                 #Read characters as word until digit, whitespace or symbol (+,-,=,>)
+    ([^\s\+>\-]+)                   #Read characters as word until digit, whitespace or symbol (+,-,=,>)
     \s*                             #Ignore whitespaces
     \->                             #Find arrow
+    \s*                             #Find trailing whitespaces
     """
     regExpEqEnd = """
     (\d*)                           #Find integers
     \s*                             #Ignore whitespaces
-    ([^\d\s\+>\-]+)                 #Read characters as word until digit, whitespace or symbol (+,-,=,>)
+    ([^\s\+>\-]+)                   #Read characters as word until digit, whitespace or symbol (+,-,=,>)
     \s*                             #Ignore whitespaces
     \[                              #Find bracket
+    \s*                             #Find trailing whitespaces
     """
     regExpEqConstant = """
     \[                              #Find open brackets
@@ -50,6 +74,7 @@ def parseText(inputStrings):
     ([\d\.\-]*)                     #Find numbers
     \s*                             #Ignore whitespaces
     \]                              #Find close brackets
+    \s*                             #Find trailing whitespaces
     """
     regExpDeclaration = """
     ([^\d\s\+>\-]+)                 #Read characters as word until digit, whitespace or symbol (+,-,=,>)
@@ -57,8 +82,9 @@ def parseText(inputStrings):
     =                               #Find equal
     \s*                             #Ignore whitespaces
     (\d*)                           #Find integers
+    \s*                             #Find trailing whitespaces
     """
-
+    
     for i, line in enumerate(inputStrings):
         #Define outputs
         reactants = {}
@@ -66,7 +92,7 @@ def parseText(inputStrings):
         netChange = {}
         moleCount = 0
         constant = 0
-
+        
         #Put all regex matches in a list
         eqPlusMatches = list(re.finditer(regExpEqPlus, line, re.VERBOSE))
         eqArrowMatches = list(re.finditer(regExpEqArrow, line, re.VERBOSE))
@@ -85,9 +111,16 @@ def parseText(inputStrings):
             raise ParsingSyntaxError("ERROR: The parser found more than one equal sign in line " + str(i) + ":\n" + line)
         if len(eqArrowMatches) == len(declarationMatches):
             raise ParsingSyntaxError("ERROR: The parser could not determine whether line " + str(i) + " is a molecule-count declaration or reaction equation:\n" + line)
-
+        
         definitionOrEquation = bool(len(declarationMatches))   #If the line is an definition, lineType will be True. If the line is an equation, lineType will be False.
-
+        
+        notMatchedData = notAllMatched(line, eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches)
+        if notMatchedData != None:
+            for notMatchedSet in notMatchedData:
+                print "WARNING: The parser could not identify the meaning of line " + str(notMatchedSet[0]) + " characters ",
+                print str(notMatchedSet[0]) + " through " + str(notMatchedSet[1]) + ": " + notMatchedSet[2]
+                print "Ignoring error..."
+        
         if definitionOrEquation == False:   #If the line is an equation
             eqSplitter = eqArrowMatches[0].end()    #Split the line at the first arrow
             #Make sure no more than one reaction constant is specified
@@ -123,4 +156,5 @@ def parseText(inputStrings):
             elementName = declarationMatches[0].group(1)
             moleCounts[elementName] = moleCount
     return equations, moleCounts
-        
+
+#print parseText(testStrings)
