@@ -107,6 +107,8 @@ def parseText(inputStrings):
             raise ParsingSyntaxError("ERROR: The parser found more than one equation terminator in line (you may be missing a '+') " + str(i) + ":\n" + line)
         if len(eqConstantMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one reaction constant in line " + str(i) + ":\n" + line)
+        if len(eqConstantMatches) < 1:
+            raise ParsingSyntaxError("ERROR: The parser found no reaction constant in line " + str(i) + ":\n" + line)
         if len(declarationMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one equal sign in line " + str(i) + ":\n" + line)
         if len(eqArrowMatches) == len(declarationMatches):
@@ -156,5 +158,3 @@ def parseText(inputStrings):
             elementName = declarationMatches[0].group(1)
             moleCounts[elementName] = moleCount
     return equations, moleCounts
-
-#print parseText(testStrings)
