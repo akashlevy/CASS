@@ -2,8 +2,6 @@
 import re, sys, math, numpy, pylab
 import random as rng
 
-testStrings = ['3h2o + Q -> 3M','J/3P -> N + M [0.005]','M*2P + Q -> 5N [0.005]']
-
 #Exception that is raised when an error is found during parsing
 class ParsingSyntaxError(Exception):
     def __init__(self, string):
@@ -45,30 +43,34 @@ def parseText(inputStrings):
     
     #Regular expressions
     regExpEqPlus = """
+    \s*                             #Find leading whitespaces
     (\d*)                           #Find integers
     \s*                             #Ignore whitespaces
-    ([^\s\+>\-]+)                   #Read characters as word until digit, whitespace or symbol (+,-,=,>)
+    ([^\s\+>\-\[]+)                 #Read characters as word until non-internal digit, whitespace or symbol (+,-,=,>)
     \s*                             #Ignore whitespaces
     \+                              #Find +
     \s*                             #Find trailing whitespaces
     """
     regExpEqArrow = """
+    \s*                             #Find leading whitespaces
     (\d*)                           #Find integers
     \s*                             #Ignore whitespaces
-    ([^\s\+>\-]+)                   #Read characters as word until digit, whitespace or symbol (+,-,=,>)
+    ([^\s\+>\-\[]+)                 #Read characters as word until non-internal digit, whitespace or symbol ([,+,-,=,>)
     \s*                             #Ignore whitespaces
     \->                             #Find arrow
     \s*                             #Find trailing whitespaces
     """
     regExpEqEnd = """
+    \s*                             #Find leading whitespaces
     (\d*)                           #Find integers
     \s*                             #Ignore whitespaces
-    ([^\s\+>\-]+)                   #Read characters as word until digit, whitespace or symbol (+,-,=,>)
+    ([^\s\+>\-\[]+)                 #Read characters as word until space or open bracket
     \s*                             #Ignore whitespaces
-    \[                              #Find bracket
+    \[                              #Find open bracket
     \s*                             #Find trailing whitespaces
     """
     regExpEqConstant = """
+    \s*                             #Find leading whitespaces
     \[                              #Find open brackets
     \s*                             #Ignore whitespaces
     ([\d\.\-]*)                     #Find numbers
@@ -77,7 +79,8 @@ def parseText(inputStrings):
     \s*                             #Find trailing whitespaces
     """
     regExpDeclaration = """
-    ([^\d\s\+>\-]+)                 #Read characters as word until digit, whitespace or symbol (+,-,=,>)
+    \s*                             #Find leading whitespaces
+    ([^\s\+>\-]+)                   #Read characters as word until non-internal digit, whitespace or symbol (+,-,=,>)
     \s*                             #Ignore whitespaces
     =                               #Find equal
     \s*                             #Ignore whitespaces
@@ -99,6 +102,9 @@ def parseText(inputStrings):
         eqEndMatches = list(re.finditer(regExpEqEnd, line, re.VERBOSE))
         eqConstantMatches = list(re.finditer(regExpEqConstant, line, re.VERBOSE))
         declarationMatches = list(re.finditer(regExpDeclaration, line, re.VERBOSE))
+
+        #for match in eqPlusMatches + eqArrowMatches + eqEndMatches:
+        #    print match.groups()
         
         #Check for errors
         if len(eqArrowMatches) > 1:
@@ -107,7 +113,7 @@ def parseText(inputStrings):
             raise ParsingSyntaxError("ERROR: The parser found more than one equation terminator in line (you may be missing a '+') " + str(i) + ":\n" + line)
         if len(eqConstantMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one reaction constant in line " + str(i) + ":\n" + line)
-        if len(eqConstantMatches) < 1:
+        if (len(eqConstantMatches) < 1 and len(declarationMatches) <1):
             raise ParsingSyntaxError("ERROR: The parser found no reaction constant in line " + str(i) + ":\n" + line)
         if len(declarationMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one equal sign in line " + str(i) + ":\n" + line)
@@ -119,7 +125,7 @@ def parseText(inputStrings):
         notMatchedData = notAllMatched(line, eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches)
         if notMatchedData != None:
             for notMatchedSet in notMatchedData:
-                print "WARNING: The parser could not identify the meaning of line " + str(notMatchedSet[0]) + " characters ",
+                print "WARNING: The parser could not identify the meaning of line " + str(i+1) + " characters ",
                 print str(notMatchedSet[0]) + " through " + str(notMatchedSet[1]) + ": " + notMatchedSet[2]
                 print "Ignoring error..."
         
