@@ -14,17 +14,18 @@ def mainCASS():
             print "Please enter your text file name (do not include .txt):",
             fileName = str(raw_input())
             fooFile = open(fileName + ".txt")
-            fileOK = False
+            fileOK = True
         except IOError:
             print "Error - File does not exist"
-
-    #Sets inputs to temporary variables for organization
     equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(fooFile.readlines())
     print equations
     print moleCounts
+    print duration
+    print max_iterations
+    print output_freq
+    print plots
 
     #Calls processor
-    CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, fileName)
+    CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
 
 mainCASS()
-    

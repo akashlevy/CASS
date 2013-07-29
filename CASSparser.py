@@ -87,17 +87,28 @@ def parseText(inputStrings):
     """
     regExpPlot = """
     \s*                             #Ignore leading whitespaces
-    [Pp][Ll][Oo][Tt]                #Find plot (not case-sensitive)
+    plot                            #Find plot (not case-sensitive)
     """
     regExpPlotArgs = """
     \s*                             #Ignore leading whitespaces
-    ([^\s])                         #Read characters as word until space
-    vs.                             #Find vs.
-    ([^\s,])                        #Read characters as word until space or comma
+    ([^\s]+)                        #Read characters as word until space
+    \s*                             #Ignore whitespaces
+    vs\.                            #Find vs.
+    \s*                             #Ignore whitespaces
+    ([^\s,]+)                       #Read characters as word until space or comma
     \s*                             #Ignore trailing whitespaces
+    ,?
+    \s*
     """
+
+    #Remove exclusively newline character lines
+    inputStrings = filter(lambda a: a != "\n", inputStrings)
     
     for i, line in enumerate(inputStrings):
+        #If line is a comment or a blank line, ignore it
+        if re.match("#", line) or re.search("\S", line) == None:
+            continue
+        
         #Define outputs
         reactants = {}
         products = {}
@@ -111,12 +122,15 @@ def parseText(inputStrings):
         eqEndMatches = list(re.finditer(regExpEqEnd, line, re.VERBOSE))
         eqConstantMatches = list(re.finditer(regExpEqConstant, line, re.VERBOSE))
         declarationMatches = list(re.finditer(regExpDeclaration, line, re.VERBOSE))
-        plotMatches = list(re.finditer(regExpPlot, line, re.VERBOSE))
+        plotMatches = list(re.finditer(regExpPlot, line, re.VERBOSE|re.IGNORECASE))
         plotArgsMatches = list(re.finditer(regExpPlotArgs, line, re.VERBOSE))
 
-        #for match in eqPlusMatches + eqArrowMatches + eqEndMatches:
+        #for match in eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches + plotMatches + plotArgsMatches:
+        #for match in eqArrowMatches + eqConstantMatches:
         #    print match.groups(), match.start(), match.end()
-        
+        #print len(eqArrowMatches)
+        #print len(eqConstantMatches)
+
         #Check for errors
         if len(eqArrowMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one arrow in line " + str(i) + ":\n" + line)        
@@ -126,32 +140,32 @@ def parseText(inputStrings):
             raise ParsingSyntaxError("ERROR: The parser found more than one reaction constant in line " + str(i) + ":\n" + line)
         if len(declarationMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one equal sign in line " + str(i) + ":\n" + line)
-        if len(regExpPlot) > 1:
+        if len(plotMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one PLOT command in line " + str(i) + ":\n" + line)
-
+        
         #Figure out whether the line is a reaction, molecule count or plot
         lineType = ""
-        if len(plotMatches) == 1 and len(plotArgMatches) == 1:
+        print len(plotMatches), len(plotArgsMatches)
+        if len(plotMatches) == 1 and len(plotArgsMatches) >= 1:
             lineType = "plot"
-        elif len(eqConstantMatches) == 1 and len(eqArrowMatches) == 1:
+        if len(eqConstantMatches) == 1 and len(eqArrowMatches) == 1:
             if lineType != "":
-                 raise ParsingSyntaxError("ERROR: Could not identify line type for line " + str(i) + ":\n" + line)
+                 raise ParsingSyntaxError("ERROR: Ambiguous line type for line " + str(i) + ":\n" + line)
             else:
                 lineType = "equation"
-        elif len(declarationMatches) == 1:
+        if len(declarationMatches) == 1:
             if lineType != "":
-                raise ParsingSyntaxError("ERROR: Could not identify line type for line " + str(i) + ":\n" + line)
+                raise ParsingSyntaxError("ERROR: Ambiguous line type for line " + str(i) + ":\n" + line)
             else:
                 lineType = "declaration"
-        else:
+        if lineType == "":
             raise ParsingSyntaxError("ERROR: Could not identify line type for line " + str(i) + ":\n" + line)
                 
         #Make sure all characters are matched, otherwise warn the user
-        notMatchedData = notAllMatched(line, eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches)
+        notMatchedData = notAllMatched(line, eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches + plotMatches + plotArgsMatches)
         if notMatchedData != None:
             for notMatchedSet in notMatchedData:
-                print "WARNING: The parser could not identify the meaning of line " + str(i+1) + " characters ",
-                print str(notMatchedSet[0]) + " through " + str(notMatchedSet[1]) + ": " + notMatchedSet[2]
+                print "WARNING: The parser could not identify the meaning of line " + str(i) + " characters " + str(notMatchedSet[0]) + " through " + str(notMatchedSet[1]) + ":\n" + notMatchedSet[2]
                 print "Ignoring error(s)..."
         
         if lineType == "equation":
@@ -185,11 +199,11 @@ def parseText(inputStrings):
             for reactant in reactants.keys():
                 netChange[reactant] = products[reactant] - reactants[reactant]
             equations.append((constant, reactants, netChange))
-        elif lineType == "definition":
+        elif lineType == "declaration":
             try:
                 moleCount = float(declarationMatches[0].group(2))
             except ValueError as e:
-                raise ParsingSyntaxError("ERROR: The parser was unable to read the molecule count in line " + str(i) + ":\n" + line + ".\n" + e.args[0])
+                raise ParsingSyntaxError("ERROR: The parser was unable to read the molecule count in line " + str(i) + ":\n" + line + "The error was: " + e.args[0])
             elementName = declarationMatches[0].group(1)
             if elementName == "duration":
                 duration = moleCount
