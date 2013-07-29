@@ -1,3 +1,8 @@
+import CASSparser
+import CASSprocessor
+import CASSoutput
+import CASSuserInputConverter
+
 from Tkinter import *
 import matplotlib
 matplotlib.use('TkAgg')
@@ -11,140 +16,293 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
 class Application(Frame):
+    #top level frame containing everything
+    
+    #, duration, maxIterations, rxnsAndMolCounts,
+    #             tupleInputs, molCounts, outputFreq, molVSList
     def createWidgets(self):
-        inputBox = variableInput(self)
-        inputBox.pack(side = "left", fill=Y)
+        self.inputBox = variableInput(self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.moleculeText, self.reactionText, self)
+        self.inputBox.pack(side = "left", fill=Y)
         
-        outputBox = dataOutput(self)
-        outputBox.pack(side = "right", padx = 10)
+        self.outputBox = dataOutput(self.duration, self.maxIterations, self.rxnsAndMolCounts, self.tupleInputs,
+                               self.molCounts, self.outputFreq, self.molVSList, self.moleculeText, self.reactionText, self.graph, self)
+        self.outputBox.pack(side = "right", padx = 10)
         
-    def __init__(self, master=None):
+    def __init__(self, duration, maxIterations, rxnsAndMolCounts,
+                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
         Frame.__init__(self, master, padx = 5, pady = 5)
         self.master = master
         master.title("CASS")
         self.pack()
+        
+        self.duration = duration
+        self.maxIterations = maxIterations
+        self.rxnsAndMolCounts = rxnsAndMolCounts
+        self.tupleInputs = tupleInputs
+        self.molCounts = molCounts
+        self.outputFreq = outputFreq
+        self.molVSList = molVSList
+        self.moleculeText = moleculeText
+        self.reactionText = reactionText
+        self.graph = graph
+        
         self.createWidgets()
 
 class variableInput(Frame):
+    #leftmost pane of GUI
+    
     def createWidgets(self):
-        parametersbox = parameters(self)
-        parametersbox.grid(row = 0, column = 0, sticky = "WE")
+        self.parametersbox = parameters(self.duration, self.maxIterations, self.outputFreq, self)
+        self.parametersbox.grid(row = 0, column = 0, sticky = "WE")
 
-        moleculesbox = molecules(self)
-        moleculesbox.grid(row = 1, column = 0)
+        self.moleculesbox = molecules(self.moleculeText, self)
+        self.moleculesbox.grid(row = 1, column = 0)
 
-        reactionsbox = reactions(self)
-        reactionsbox.grid(row = 2, column = 0)
-    def __init__(self, master=None):
+        self.reactionsbox = reactions(self.reactionText, self)
+        self.reactionsbox.grid(row = 2, column = 0)
+        
+    def __init__(self, duration, maxIterations, outputFreq, molVSList, moleculeText, reactionText, master=None):
         Frame.__init__(self, master)
+        self.master = master
+        
+        self.duration = duration
+        self.maxIterations = maxIterations
+        self.outputFreq = outputFreq
+        self.molVSList = molVSList
+        self.moleculeText = moleculeText
+        self.reactionText = reactionText
+        
         self.createWidgets()
 
 class dataOutput(Frame):
-    def createWidgets(self):
-        runBox = runControl(self)
-        runBox.grid(row = 1, column = 0, sticky = "WE")
-
-        analysisBox = analysis(self)
-        analysisBox.grid(row = 2, column = 0, sticky = "WES")
-
-        graphBox = graphDisplay(self)
-        graphBox.grid(row=0, column = 0, sticky = "WEN")
+    #rightmost pane of GUI
     
-    def __init__(self, master=None):
+    def createWidgets(self):
+        self.runBox = runControl(self.duration, self.maxIterations, self.rxnsAndMolCounts, self.tupleInputs,
+                               self.molCounts, self.outputFreq, self.molVSList, self.moleculeText, self.reactionText, self.graph, self)
+        self.runBox.grid(row = 1, column = 0, sticky = "WE")
+
+        self.analysisBox = analysis(self)
+        self.analysisBox.grid(row = 2, column = 0, sticky = "WES")
+
+        self.graphBox = graphDisplay(self.graph, self)
+        self.graphBox.grid(row=0, column = 0, sticky = "WEN")
+    
+    def __init__(self, duration, maxIterations, rxnsAndMolCounts,
+                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
         Frame.__init__(self, master)
+        self.master = master
+        
+        self.duration = duration
+        self.maxIterations = maxIterations
+        self.rxnsAndMolCounts = rxnsAndMolCounts
+        self.tupleInputs = tupleInputs
+        self.molCounts = molCounts
+        self.outputFreq = outputFreq
+        self.molVSList = molVSList
+        self.moleculeText = moleculeText
+        self.reactionText = reactionText
+        self.graph = graph
+        
         self.createWidgets()
 
 class parameters(LabelFrame):
-    def createWidgets(self):
-        iterationsLabel = Label(self, text = "Iterations:")
-        iterationsLabel.grid(row = 0, column = 0)
+    #allows the user to input iterations, duration, output frequency, and plotted variables and pass them to the master
+
+    def getInputData(self, iterationsEntry, durationEntry, outputFreqEntry):
+        self.master.master.outputBox.runBox.maxIterations = float(iterationsEntry.get())
+        self.master.master.outputBox.runBox.outputFreq = float(outputFreqEntry.get())
+        self.master.master.outputBox.runBox.duration = float(durationEntry.get())
         
-        variablesLabel = Label(self, text = "Plotted Variables:")
-        variablesLabel.grid(row = 1, column = 0)
+    def createWidgets(self):
+        self.iterationsLabel = Label(self, text = "Iterations:")
+        self.iterationsLabel.grid(row = 0, column = 0, sticky = 'W')
 
-        iterationsEntry = Entry(self, width = 20)
-        iterationsEntry.grid(row = 0, column = 1)
+        self.durationLabel = Label(self, text = "Duration:")
+        self.durationLabel.grid(row = 1, column = 0, sticky = 'W')
 
-        variablesEntry = Entry(self, width = 20)
-        variablesEntry.grid(row = 1, column = 1)
-    def __init__(self, master=None):
+        self.outputFreqLabel = Label(self, text = "Output Frequency:")
+        self.outputFreqLabel.grid(row = 2, column = 0, sticky = 'W')
+
+        self.iterationsEntry = Entry(self, width = 20)
+        self.iterationsEntry.grid(row = 0, column = 1)
+
+        self.durationEntry = Entry(self, width = 20)
+        self.durationEntry.grid(row = 1, column = 1)
+
+        self.outputFreqEntry = Entry(self, width = 20)
+        self.outputFreqEntry.grid(row = 2, column = 1)
+
+        self.submitButton = Button(self, text = "Submit", command = lambda: self.getInputData(self.iterationsEntry, self.durationEntry, self.outputFreqEntry))
+        self.submitButton.grid(row = 3, column = 0, sticky = 'W')
+    def __init__(self, duration, maxIterations, outputFreq, master=None):
         LabelFrame.__init__(self, master, text = "Parameters", padx = 5, pady = 10)
+        self.master = master
+
+        self.duration = duration
+        self.maxIterations = maxIterations
+        self.outputFreq = outputFreq
+        
         self.createWidgets()
         
 class molecules(LabelFrame):
+    #allows the user to input molecounts and passes them up to the master
+    
+    def submitMolecules(self, textBox):
+        self.moleculeText = textBox.get('1.0', 'end')
+        self.master.master.outputBox.runBox.moleculeText = self.moleculeText
+    def clearMolecules(self, textBox):
+        textBox.delete('1.0', 'end')
+        self.moleculeText = textBox.get('1.0', 'end')
+        self.master.master.outputBox.runBox.moleculeText = self.moleculeText
+        
     def createWidgets(self):
-        textBox = Text(self, width = 40, height = 10)
-        textBox.pack()
+        self.textBox = Text(self, width = 40, height = 10)
+        self.textBox.pack()
 
-        submitButton = Button(self, text = "Submit")
-        submitButton.pack(pady = 5, side = "left")
+        #using lambda allows arguments to be passed to submitMolecules method
+        self.submitButton = Button(self, text = "Submit", command = lambda: self.submitMolecules(self.textBox))
+        self.submitButton.pack(pady = 5, side = "left")
 
-        clearButton = Button(self, text = "Clear")
-        clearButton.pack(pady = 5, padx = 5, side = "left")
-    def __init__(self, master=None):
+        self.clearButton = Button(self, text = "Clear", command = lambda: self.clearMolecules(self.textBox))
+        self.clearButton.pack(pady = 5, padx = 5, side = "left")
+        
+    def __init__(self, moleculeText, master=None):
         LabelFrame.__init__(self, master, text = "Molecules", padx = 5)
+        self.master = master
+
+        self.moleculeText = moleculeText
         self.createWidgets()
 
 class reactions(LabelFrame):
-    def createWidgets(self):
-        textBox = Text(self, width = 40, height = 10)
-        textBox.pack()
-        
-        submitButton = Button(self, text = "Submit")
-        submitButton.pack(pady = 5, side = "left")
+    #allows the user to input reactions and passes them up to the master
+    
+    def submitReactions(self, textBox):
+        self.reactionText = textBox.get('1.0', 'end')
+        self.master.master.outputBox.runBox.reactionText = self.reactionText
 
-        clearButton = Button(self, text = "Clear")
+    def clearReactions(self, textBox):
+        textBox.delete('1.0', 'end')
+        self.reactionText = textBox.get('1.0', 'end')
+        self.master.master.outputBox.runBox.reactionText = self.reactionText
+        
+    def createWidgets(self):
+        self.textBox = Text(self, width = 40, height = 10)
+        self.textBox.pack()
+        
+        self.submitButton = Button(self, text = "Submit", command = lambda: self.submitReactions(self.textBox))
+        self.submitButton.pack(pady = 5, side = "left")
+
+        clearButton = Button(self, text = "Clear", command = lambda: self.clearReactions(self.textBox))
         clearButton.pack(pady = 5, padx = 5, side = "left")
-    def __init__(self, master=None):
+    def __init__(self, reactionText, master=None):
         LabelFrame.__init__(self, master, text = "Reactions", padx = 5)
+        self.master = master
+
+        self.reactionText = reactionText
         self.createWidgets()
 
 class runControl(LabelFrame):
+    #allows the user to input a seed and run the reaction
+
+    def runSimulation(self, duration, maxIterations, rxnsAndMolCounts, tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph):
+        #parses the inputs and runs the actual reaction
+        rxnsAndMolCounts = (reactionText+moleculeText).splitlines()
+        print(rxnsAndMolCounts)
+        EqnsNmolCounts = CASSparser.parseText(rxnsAndMolCounts)
+        tupleInputs = EqnsNmolCounts[0]
+        print(tupleInputs)
+        molCounts = EqnsNmolCounts[1]
+        print(molCounts)
+        #temporary hardcoding, will need to change later
+        molVSList = [('R', 'W'), ('W', 'R')] #############################################
+        
+        #Calls processor
+        self.master.graphBox.graph = CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList)
+        self.master.graphBox.destroyWidgets()
+        self.master.graphBox.createWidgets()
+
     def createWidgets(self):
-        seedLabel = Label(self, text = "Random Seed:")
-        seedLabel.grid(row = 0, column = 0)
+        self.seedLabel = Label(self, text = "Random Seed:")
+        self.seedLabel.grid(row = 0, column = 0)
 
-        seedEntry = Entry(self, width = 20)
-        seedEntry.grid(row = 0, column = 1)
+        self.seedEntry = Entry(self, width = 20)
+        self.seedEntry.grid(row = 0, column = 1)
 
-        runButton = Button(self, text = "Run")
-        runButton.grid(row = 1, column = 0, sticky = "W")
-    def __init__(self, master=None):
+        self.runButton = Button(self, text = "Run", command = lambda: self.runSimulation(self.duration, self.maxIterations, self.rxnsAndMolCounts, self.tupleInputs,
+                                                                                    self.molCounts, self.outputFreq, self.molVSList, self.moleculeText,
+                                                                                    self.reactionText, self.graph))
+        self.runButton.grid(row = 1, column = 0, sticky = "W")
+    def __init__(self, duration, maxIterations, rxnsAndMolCounts,
+                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
         LabelFrame.__init__(self, master, text = "Run Control", padx = 5, pady = 5)
+        self.master = master
+        
+        self.duration = duration
+        self.maxIterations = maxIterations
+        self.rxnsAndMolCounts = rxnsAndMolCounts
+        self.tupleInputs = tupleInputs
+        self.molCounts = molCounts
+        self.outputFreq = outputFreq
+        self.molVSList = molVSList
+        self.moleculeText = moleculeText
+        self.reactionText = reactionText
+        self.graph = graph
+        
         self.createWidgets()
 
 class graphDisplay(Frame):
+    #displays the results of the reaction in graph form
+    
     def createWidgets(self):
-        f = Figure(figsize=(5,4), dpi=100)
-        a = f.add_subplot(111)
-        t = arange(0.0,3.0,0.01)
-        s = sin(2*pi*t)
+        self.frame = Frame(self)
+        self.frame.pack()
+        self.canvas = FigureCanvasTkAgg(self.graph, master=self.frame)
+        self.canvas.show()
+        self.canvas.get_tk_widget().pack(side="top", fill=BOTH, expand=1)
 
-        a.plot(t,s)
-
-
-        # a tk.DrawingArea
-        canvas = FigureCanvasTkAgg(f, master=self)
-        canvas.show()
-        canvas.get_tk_widget().pack(side="top", fill=BOTH, expand=1)
-
-        toolbar = NavigationToolbar2TkAgg( canvas, self )
-        toolbar.update()
-        canvas._tkcanvas.pack(side="top", fill=BOTH, expand=1)
-    def __init__(self, master=None):
+        self.toolbar = NavigationToolbar2TkAgg(self.canvas, self.frame)
+        self.toolbar.update()
+        self.canvas._tkcanvas.pack(side="top", fill=BOTH, expand=1)
+    def destroyWidgets(self):
+        self.frame.destroy()
+    def __init__(self, graph, master=None):
         Frame.__init__(self, master)
+        self.master = master
+        
+        self.graph = graph
         self.createWidgets()
+        
 class analysis(LabelFrame):
+    #outputs text such as error messages
+    
     def createWidgets(self):
-        textBox = Text(self, width = 40, height = 5)
-        textBox.config(state = DISABLED)
-        textBox.pack()
+        self.textBox = Text(self, width = 60, height = 5)
+        self.textBox.config(state = DISABLED)
+        self.textBox.pack()
     def __init__(self, master=None):
         LabelFrame.__init__(self, master, text = "Analysis", padx = 5, pady = 5)
+        self.master = master
+        
         self.createWidgets()
 
 root = Tk()
-app = Application(master=root)
+
+#default values
+duration = 30.0
+maxIterations = 1000000
+rxnsAndMolCounts = ""
+tupleInputs = tuple()
+molCounts = tuple()
+outputFreq = 1000
+molVSList = []
+moleculeText = ""
+reactionText = ""
+graph = Figure(figsize = (5, 4), dpi=100)
+
+app = Application(duration, maxIterations, rxnsAndMolCounts,
+                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=root)
+
 menuBar = Menu(root)
 
 fileMenu = Menu(menuBar, tearoff = 0)
@@ -160,4 +318,5 @@ helpMenu.add_separator()
 helpMenu.add_command(label = "CASS Help")
 menuBar.add_cascade(label = "Help", menu = helpMenu)
 root.config(menu=menuBar)
+
 app.mainloop()
