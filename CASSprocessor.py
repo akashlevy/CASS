@@ -21,7 +21,7 @@ class ProcessingError(Exception):
         print "The program will now exit."
         sys.exit(1)
 
-def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, inputName):
+def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, inputName= None):
     rng.seed(124213)
     time       = 0.0
     iteration  = 0
@@ -84,10 +84,7 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
         iteration += 1
     close_output_files(fileHandles)
     if(molVSList!=None):
-        print "Check newly opened window for plots"
-        CASSoutput.graphResults(fileHandles,molCounts,molVSList,suffix)
-    
-    print "Simulation Complete - Check Folder for files"
+        return CASSoutput.graphResults(fileHandles,molCounts,molVSList,suffix)
 
 
 #takes one tuple and returns propensity based on Gillespie Algorithm   
