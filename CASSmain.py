@@ -24,7 +24,7 @@ def mainCASS():
     print moleCounts
 
     #Calls processor
-    CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, inputName)
+    CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, fileName)
 
 mainCASS()
     
