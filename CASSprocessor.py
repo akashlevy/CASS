@@ -13,6 +13,14 @@ import CASSoutput
     #"molVSList" = a list of tuples of strings representing the molecules/time to be plotted against each other
     #"inputName" = a string representing the name of the input file
 
+class ProcessingError(Exception):
+    def __init__(self, string):
+        #Print error message
+        print string
+        print
+        print "The program will now exit."
+        sys.exit(1)
+
 def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, inputName):
     rng.seed(124213)
     time       = 0.0
@@ -30,8 +38,7 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
     if molVSList !=None:
         for vs in molVSList:
             if((vs[0] not in molCounts and "time" not in vs[0].lower()) or (vs[1] not in molCounts and "time" not in vs[1].lower())):
-                    print "\nError - Plotting variables (%s) that do not exist"%("%s vs. %s"%(vs[0],vs[1]))
-                    sys.exit(0)
+                    raise ProcessingError("\nError - Plotting variables (%s) that do not exist"%("%s vs. %s"%(vs[0],vs[1])))
             print "%s vs. %s,"%(vs[0],vs[1]),
     print "\n------------------"
     print "Processing..."
@@ -97,8 +104,7 @@ def computePropensity(tupleInput, molCounts):
                     propProduct *= (1.0*calcNPR(molCounts[key],coeffs[key])*(1.0/(coeffs[key])))
                 break
             except KeyError:
-                print "ERROR - %s is not in the molecule list"%(key)
-                sys.exit(1)
+                raise ProcessingError("ERROR - %s is not in the molecule list"%(key))
     return propProduct
 
 #Takes two integers n and r, and returns nPr (i.e. P(n,r))
@@ -119,7 +125,7 @@ def reactionUpdater(rxn,molCounts):
             molCounts[key]+=rxn[key] #corresponds molecules based on key name
             #assert(molCounts[key]>0), 'Molecule %s has ran out'%(key)
         else:
-            print "ERROR - %s Molecule not Found"%(key)
+            raise ProcessingError("ERROR - %s Molecule not Found"%(key))
     return molCounts
 
 #Creates writable files for each output file
