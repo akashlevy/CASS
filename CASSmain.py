@@ -1,5 +1,4 @@
-import CASSparser, CASSuserInputConverter, CASSprocessor, CASSoutput
-import sys
+import CASSparser, CASSprocessor, CASSoutput
 
 def mainCASS():
     print "****************************"
@@ -7,31 +6,22 @@ def mainCASS():
     print "****************************"
     print "-This stochastic simulator is useful for modeling biochemical networks."
     print "-Make sure your file is in the correct format (See Documentation)"
-    print "and verify that the file is in the current working directory\n"
+    print "-Verify that the file is in the current working directory\n"
 
-    loop = True
-    while(loop):
+    fileOK = False
+    while not fileOK:
         try:
             print "Please enter your text file name (do not include .txt):",
             fileName = str(raw_input())
-            fooFile = open(fileName+".txt")
-            loop=False
+            fooFile = open(fileName + ".txt")
+            fileOK = False
         except IOError:
             print "Error - File does not exist"
 
     #Sets inputs to temporary variables for organization
-    elements = CASSuserInputConverter.inputReactions(fileName)
-    rxnsAndMolCounts=elements[0]
-    duration=elements[1]
-    maxIterations=elements[2]
-    outputFreq=elements[3]
-    molVSList=elements[4]
-    inputName=elements[5]
-
-    EqnsNmolCounts = CASSparser.parseText(rxnsAndMolCounts)
-    print EqnsNmolCounts
-    tupleInputs = EqnsNmolCounts[0]
-    molCounts = EqnsNmolCounts[1]
+    equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(fooFile.readlines())
+    print equations
+    print moleCounts
 
     #Calls processor
     CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList, inputName)
