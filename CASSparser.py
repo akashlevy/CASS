@@ -1,6 +1,8 @@
 #Import regular expression library and sys for exit()
-import re, sys, math, numpy, pylab
+import re, sys, math, numpy, pylab, ast
 import random as rng
+
+#TO-DO: CATCH FOR NUMBER FORMAT EXCEPTIONS!
 
 #Exception that is raised when an error is found during parsing
 class ParsingSyntaxError(Exception):
@@ -25,10 +27,9 @@ def notAllMatched(inputString, matches):
         characterThere = found[i]
         if not characterThere:
             startPos = i
-            while (not characterThere) and (i < len(inputString)):
+            while (not characterThere) and (i < len(found)):
                 i+=1
                 characterThere = found[i]
-                
             endPos = i
             errorString = inputString[startPos:endPos]
             allFound.append([startPos, endPos, errorString])
@@ -84,10 +85,10 @@ def parseText(inputStrings):
     \s*                             #Ignore whitespaces
     =                               #Find equal
     \s*                             #Ignore whitespaces
-    (\d*)                           #Find integers
+    ([\de\+]*)                      #Find integers 
     \s*                             #Find trailing whitespaces
     """
-    
+    ##MUST FIND DECIMAL FORMAT TOO!
     for i, line in enumerate(inputStrings):
         #Define outputs
         reactants = {}
@@ -151,7 +152,7 @@ def parseText(inputStrings):
                         reactants[elementName] = coefficient
                 elif match.start() >= eqSplitter:
                     if elementName in products and products[elementName] != 0:
-                            raise ParsingSyntaxError("ERROR: The parser found more than one of the same product in line " + str(i) + ":\n" + line)
+                        raise ParsingSyntaxError("ERROR: The parser found more than one of the same product in line " + str(i) + ":\n" + line)
                     else:
                         if not elementName in reactants:
                             reactants[elementName] = 0
@@ -160,7 +161,10 @@ def parseText(inputStrings):
                 netChange[reactant] = products[reactant] - reactants[reactant]
             equations.append((constant, reactants, netChange))
         else:   #If the line is a definition
-            moleCount = int(declarationMatches[0].group(2))
+            try:
+                moleCount = ast.literal_eval(declarationMatches[0].group(2))
+            except ValueError:
+                raise ParsingSyntaxError("EEEOR: The parser was not able to read the molecule count in line " + str(i) + ":\n" + line)
             elementName = declarationMatches[0].group(1)
             moleCounts[elementName] = moleCount
     return equations, moleCounts
