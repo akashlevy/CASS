@@ -12,7 +12,7 @@ class ParsingSyntaxError(Exception):
         sys.exit(1)
 
 #Some working test strings
-#testStrings = ['Akash = 0','Akash + 12Darn -> Fub [-1.33]','4B + D -> A [1.44]','C + 3A -> 2B [1.68]','A = 40','B = 20','C = 10','D = 5']
+testStrings = ["12air + glucose -> 6water + 6co2 [.01]","air + 2h2 -> 2water [.005]","2water + 3sucrose -> air + co2 [.03]","sucrose + co2 -> glucose [.01]","water = 1.23e+10","air = 1.23e+10","glucose = 1.23e+10","h2 = 1.23e+10","co2 = 10000","sucrose = 2.5e+8"]
 
 def notAllMatched(inputString, matches):
     found = [False]*len(inputString)
@@ -26,8 +26,8 @@ def notAllMatched(inputString, matches):
         if not characterThere:
             startPos = i
             while (not characterThere) and (i < len(found)):
-                i+=1
                 characterThere = found[i]
+                i+=1
             endPos = i
             errorString = inputString[startPos:endPos]
             allFound.append([startPos, endPos, errorString])
@@ -81,12 +81,12 @@ def parseText(inputStrings):
     \s*                             #Find leading whitespaces
     ([^\s\+>\-]+)                   #Read characters as word until non-internal digit, whitespace or symbol (+,-,=,>)
     \s*                             #Ignore whitespaces
-    =                               #Find equal
+    =                               #Find equal sign
     \s*                             #Ignore whitespaces
-    ([\de\+]*)                      #Find integers 
+    ([^\s]+)                      #Find integers 
     \s*                             #Find trailing whitespaces
     """
-    ##MUST FIND DECIMAL FORMAT TOO!
+    
     for i, line in enumerate(inputStrings):
         #Define outputs
         reactants = {}
@@ -126,7 +126,7 @@ def parseText(inputStrings):
             for notMatchedSet in notMatchedData:
                 print "WARNING: The parser could not identify the meaning of line " + str(i+1) + " characters ",
                 print str(notMatchedSet[0]) + " through " + str(notMatchedSet[1]) + ": " + notMatchedSet[2]
-                print "Ignoring error..."
+                print "Ignoring error(s)..."
         
         if definitionOrEquation == False:   #If the line is an equation
             eqSplitter = eqArrowMatches[0].end()    #Split the line at the first arrow
@@ -163,9 +163,9 @@ def parseText(inputStrings):
             equations.append((constant, reactants, netChange))
         else:   #If the line is a definition
             try:
-                moleCount = ast.literal_eval(declarationMatches[0].group(2))
-            except ValueError:
-                raise ParsingSyntaxError("EEEOR: The parser was not able to read the molecule count in line " + str(i) + ":\n" + line)
+                moleCount = float(declarationMatches[0].group(2))
+            except ValueError as e:
+                raise ParsingSyntaxError("ERROR: The parser was not able to read the molecule count in line " + str(i) + ":\n" + line + ".\n" + e.args[0])
             elementName = declarationMatches[0].group(1)
             moleCounts[elementName] = moleCount
     return equations, moleCounts
