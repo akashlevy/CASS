@@ -1,6 +1,5 @@
 #Import regular expression library and sys for exit()
-import re, sys, math, numpy, pylab, ast
-import random as rng
+import re, sys
 
 #Exception that is raised when an error is found during parsing
 class ParsingSyntaxError(Exception):
@@ -126,10 +125,7 @@ def parseText(inputStrings):
         plotArgsMatches = list(re.finditer(regExpPlotArgs, line, re.VERBOSE))
 
         #for match in eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches + plotMatches + plotArgsMatches:
-        #for match in eqArrowMatches + eqConstantMatches:
         #    print match.groups(), match.start(), match.end()
-        #print len(eqArrowMatches)
-        #print len(eqConstantMatches)
 
         #Check for errors
         if len(eqArrowMatches) > 1:
@@ -145,7 +141,6 @@ def parseText(inputStrings):
         
         #Figure out whether the line is a reaction, molecule count or plot
         lineType = ""
-        print len(plotMatches), len(plotArgsMatches)
         if len(plotMatches) == 1 and len(plotArgsMatches) >= 1:
             lineType = "plot"
         if len(eqConstantMatches) == 1 and len(eqArrowMatches) == 1:

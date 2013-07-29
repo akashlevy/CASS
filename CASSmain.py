@@ -17,7 +17,8 @@ def mainCASS():
             fileOK = True
         except IOError:
             print "Error - File does not exist"
-            
+
+    #Calls parser        
     equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(fooFile.readlines())
 
     #Calls processor
