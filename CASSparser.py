@@ -2,8 +2,6 @@
 import re, sys, math, numpy, pylab, ast
 import random as rng
 
-#TO-DO: CATCH FOR NUMBER FORMAT EXCEPTIONS!
-
 #Exception that is raised when an error is found during parsing
 class ParsingSyntaxError(Exception):
     def __init__(self, string):
@@ -136,7 +134,10 @@ def parseText(inputStrings):
             if len(eqConstantMatches) > 1:
                 raise ParsingSyntaxError("ERROR: The parser found more than one reaction constant in line " + str(i) + ":\n" + line)
             else:
-                constant = float(eqConstantMatches[0].group(1)) #Set the constant equal to the match that was found
+                try:
+                    constant = float(ast.literal_eval(eqConstantMatches[0].group(1))) #Set the constant equal to the match that was found
+                except ValueError:   
+                    raise ParsingSyntaxError("ERROR: The parser was not able to read the molecule count in line " + str(i) + ":\n" + line)
             for match in (eqArrowMatches + eqPlusMatches + eqEndMatches):
                 #If coefficient is not found, then set it equal to one
                 if match.group(1) == '' or match.group(1) == None:
