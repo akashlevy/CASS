@@ -12,7 +12,7 @@ class ParsingSyntaxError(Exception):
         sys.exit(1)
 
 #Some working test strings
-testStrings = ["12air + glucose -> 6water + 6co2 [.01]","air + 2h2 -> 2water [.005]","2water + 3sucrose -> air + co2 [.03]","sucrose + co2 -> glucose [.01]","water = 1.23e+10","air = 1.23e+10","glucose = 1.23e+10","h2 = 1.23e+10","co2 = 10000","sucrose = 2.5e+8"]
+testStrings = ["air -> air [.01]","air = 1.0e+6"]
 
 def notAllMatched(inputString, matches):
     found = [False]*len(inputString)
@@ -48,7 +48,6 @@ def parseText(inputStrings):
     ([^\s\+>\-\[]+)                 #Read characters as word until non-internal digit, whitespace or symbol (+,-,=,>)
     \s*                             #Ignore whitespaces
     \+                              #Find +
-    \s*                             #Find trailing whitespaces
     """
     regExpEqArrow = """
     \s*                             #Find leading whitespaces
@@ -57,7 +56,6 @@ def parseText(inputStrings):
     ([^\s\+>\-\[]+)                 #Read characters as word until non-internal digit, whitespace or symbol ([,+,-,=,>)
     \s*                             #Ignore whitespaces
     \->                             #Find arrow
-    \s*                             #Find trailing whitespaces
     """
     regExpEqEnd = """
     \s*                             #Find leading whitespaces
@@ -66,7 +64,6 @@ def parseText(inputStrings):
     ([^\s\+>\-\[]+)                 #Read characters as word until space or open bracket
     \s*                             #Ignore whitespaces
     \[                              #Find open bracket
-    \s*                             #Find trailing whitespaces
     """
     regExpEqConstant = """
     \s*                             #Find leading whitespaces
@@ -75,7 +72,6 @@ def parseText(inputStrings):
     ([\d\.\-]*)                     #Find numbers
     \s*                             #Ignore whitespaces
     \]                              #Find close brackets
-    \s*                             #Find trailing whitespaces
     """
     regExpDeclaration = """
     \s*                             #Find leading whitespaces
@@ -83,8 +79,7 @@ def parseText(inputStrings):
     \s*                             #Ignore whitespaces
     =                               #Find equal sign
     \s*                             #Ignore whitespaces
-    ([^\s]+)                      #Find integers 
-    \s*                             #Find trailing whitespaces
+    ([^\s]+)                        #Find integers
     """
     
     for i, line in enumerate(inputStrings):
@@ -103,7 +98,7 @@ def parseText(inputStrings):
         declarationMatches = list(re.finditer(regExpDeclaration, line, re.VERBOSE))
 
         #for match in eqPlusMatches + eqArrowMatches + eqEndMatches:
-        #    print match.groups()
+        #    print match.groups(), match.start(), match.end()
         
         #Check for errors
         if len(eqArrowMatches) > 1:
@@ -147,7 +142,7 @@ def parseText(inputStrings):
                 elementName = match.group(2)
                 if match.start() < eqSplitter:
                     if elementName in reactants:
-                        raise ParsingSyntaxError("ERROR: The parser found more than one of the same reactant in line " + str(i) + ":\n" + line)
+                        reactants[elementName] += coefficient
                     else:
                         products[elementName] = 0
                         reactants[elementName] = coefficient
