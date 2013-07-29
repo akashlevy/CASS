@@ -12,14 +12,14 @@ def mainCASS():
     loop = True
     while(loop):
         try:
-            print "Please enter your text file name (do not include .txt): ",
+            print "Please enter your text file name (do not include .txt):",
             fileName = str(raw_input())
             fooFile = open(fileName+".txt")
             loop=False
         except IOError:
             print "Error - File does not exist"
 
-    #sets inputs to temporary variables for organization
+    #Sets inputs to temporary variables for organization
     elements = CASSuserInputConverter.inputReactions(fileName)
     rxnsAndMolCounts=elements[0]
     duration=elements[1]
