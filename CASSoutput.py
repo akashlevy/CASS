@@ -33,9 +33,9 @@ def graphResults(fileHandles, molCounts, molVSList, suffix):
             fig.canvas.set_window_title('Computational Adaptable Stochastic Simulator')
             path = str(os.getcwd()) + "\\Results_" + suffix
             name =("%s_Plot_%s.png"%(title1,suffix))
-            fig.savefig(os.path.join(path,name),dpi=100)
-            pylab.show()
-            pylab.close()
+            fig.savefig(os.path.join(path,name), dpi=100)
+            fig.set_size_inches(6, 5)
+            return fig
             
 #Reads the created files for plotting (specific for time variable)
 def readInTime(fileName, suffix):
