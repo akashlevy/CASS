@@ -1,4 +1,4 @@
-import math, os, numpy, pylab, sys, datetime, random as rng
+import math, os, numpy, pylab, sys, datetime, time as tm, random as rng
 import CASSoutput
 
 #Data Structure
@@ -46,7 +46,7 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
     
     #Creates new directory and opens output files
     suffix=str(datetime.datetime.now()).replace(" ","_").replace(".","").replace(":","")
-    os.mkdir(r"%s_%s"%("Results",suffix))
+    os.mkdir(r"Results_%s"%(suffix))
     fileHandles = open_output_files(molCounts, suffix)
     write_titles_to_outputFiles(fileHandles, molCounts)
 
@@ -54,7 +54,7 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
         #1. The simulated time reaches the user-input maximum time
         #2. The number of iterations reaches the user-input maximum number of iterations
         #3. All reaction propensities reach 0 (i.e. all reactions ran to completion or insufficient reactants remain for any new products)
-    
+    start_time = tm.time()
     while(time < maxTime and iteration < maxIterations):
         props = [] #list of propensity values for each reaction
         
@@ -83,7 +83,9 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
             print "iteration %d   time %5.4g" % (iteration, time)   
         iteration += 1
     close_output_files(fileHandles)
+    end_time = tm.time()
     if(molVSList!=None):
+        print "Time Elapsed = " + str(end_time - start_time)
         return CASSoutput.graphResults(fileHandles,molCounts,molVSList,suffix)
 
 
@@ -155,3 +157,4 @@ def write_data_to_output(fileHandles, time, molCounts):
 def close_output_files(fileHandles):
     for i in range(0,len(fileHandles)):
         fileHandles[i].close()
+
