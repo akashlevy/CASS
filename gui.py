@@ -1,7 +1,4 @@
-import CASSparser
-import CASSprocessor
-import CASSoutput
-import CASSuserInputConverter
+import CASSparser, CASSprocessor, CASSoutput
 
 from Tkinter import *
 import matplotlib
