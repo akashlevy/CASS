@@ -11,7 +11,6 @@ from matplotlib.backend_bases import key_press_handler
 
 from matplotlib.figure import Figure
 
-#PRIORITY_TO_DO: Add molVSList dialog box
 #TO_DO: Add an Open file dialog box
 #TO_DO: Add About CASS and CASS Help pages
 #TO_DO: Remove submit buttons
@@ -223,20 +222,58 @@ class reactions(LabelFrame):
 class runControl(LabelFrame):
     #allows the user to input a seed and run the reaction
 
+    def submitVariables(self, xAxis, yAxis):
+        #Consider wrapping in separate class
+        x = xAxis.get()
+        y = yAxis.get()
+        self.molVSList = [(x, y), (y, x)]
+        print("molVSList:", self.molVSList)
+        self.molListChooser.destroy()
+        
     def runSimulation(self, duration, maxIterations, rxnsAndMolCounts, tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph):
         #parses the inputs and runs the actual reaction
         rxnsAndMolCounts = (reactionText+moleculeText).splitlines()
-        print(rxnsAndMolCounts)
         EqnsNmolCounts = CASSparser.parseText(rxnsAndMolCounts)
         tupleInputs = EqnsNmolCounts[0]
-        print(tupleInputs)
         molCounts = EqnsNmolCounts[1]
-        print(molCounts)
-        #temporary hardcoding, will need to change later
-        molVSList = [('R', 'W'), ('W', 'R')] #############################################
+        self.molVSList = molVSList
+
+        #choosing the lists of variables to plot
+        #Consider wrapping in separate class
+        self.molListChooser = Toplevel(self)
+        self.molListChooser.title("Variable Picker")
+        self.molListChooser.resizable(FALSE, FALSE)
+        molListChooserFrame = LabelFrame(self.molListChooser, text = "Choose Variables to Plot", padx = 5)
+        
+        radioList1 = [0]*len(molCounts)
+        radioList2 = [0]*len(molCounts)
+        xAxis = StringVar()
+        yAxis = StringVar()
+        counter = 0
+        
+        xAxisLabel = Label(molListChooserFrame, text = "X Axis")
+        xAxisLabel.grid(row = 0, column = 0)
+        yAxisLabel = Label(molListChooserFrame, text = "Y Axis")
+        yAxisLabel.grid(row = 0, column = 1)
+        
+        for key in molCounts.keys():
+            print(counter)
+            radioList1[counter] = Radiobutton(molListChooserFrame, text = key, variable = xAxis, value = key)
+            radioList1[counter].grid(row = counter+1, column = 0)
+            radioList2[counter] = Radiobutton(molListChooserFrame, text = key, variable = yAxis, value = key)
+            radioList2[counter].grid(row = counter+1, column = 1)
+            counter+=1
+        submitButton = Button(molListChooserFrame, text = "Submit", command=lambda: self.submitVariables(xAxis, yAxis))
+        submitButton.grid(row=counter+1, column = 0)
+        molListChooserFrame.pack()
+        self.wait_window(self.molListChooser)
         
         #Calls processor
-        self.master.graphBox.graph = CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, molVSList)
+        print("molVSList:", self.molVSList)
+        self.master.graphBox.graph = CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, self.molVSList)
+        self.master.analysisBox.textBox.config(state=NORMAL)
+        self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
+        self.master.analysisBox.textBox.config(state=DISABLED)
         self.master.graphBox.destroyWidgets()
         self.master.graphBox.createWidgets()
 
