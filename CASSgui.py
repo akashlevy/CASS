@@ -1,6 +1,9 @@
 import CASSparser, CASSprocessor, CASSoutput
 
 from Tkinter import *
+import tkFileDialog
+import sys, os.path, os
+
 import matplotlib
 matplotlib.use('TkAgg')
 
@@ -19,6 +22,7 @@ class Application(Frame):
     
     def createWidgets(self):
         #contains an input box on the left containing fields, and an output box on the right containing the graph
+        self.mainMenu = menuBar(self.master)
         self.inputBox = variableInput(self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.moleculeText, self.reactionText, self)
         self.inputBox.pack(side = "left", fill=Y)
         
@@ -27,7 +31,7 @@ class Application(Frame):
         self.outputBox.pack(side = "right", padx = 10)
         
     def __init__(self, duration, maxIterations, rxnsAndMolCounts,
-                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
+                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, version, master=None):
         Frame.__init__(self, master, padx = 5, pady = 5)
         self.master = master
         master.title("Computational Adaptable Stochastic Simulator")
@@ -43,6 +47,7 @@ class Application(Frame):
         self.moleculeText = moleculeText
         self.reactionText = reactionText
         self.graph = graph
+        self.version = version
         
         self.createWidgets()
 
@@ -51,14 +56,14 @@ class variableInput(Frame):
     
     def createWidgets(self):
         #creates 3 input sections, one for various datapoints like duration, one for the molcounts, and one for the reactions
-        self.parametersbox = parameters(self.duration, self.maxIterations, self.outputFreq, self)
-        self.parametersbox.grid(row = 0, column = 0, sticky = "WE")
+        self.parametersBox = parameters(self.duration, self.maxIterations, self.outputFreq, self)
+        self.parametersBox.grid(row = 0, column = 0, sticky = "WE")
 
-        self.moleculesbox = molecules(self.moleculeText, self)
-        self.moleculesbox.grid(row = 1, column = 0)
+        self.moleculesBox = molecules(self.moleculeText, self)
+        self.moleculesBox.grid(row = 1, column = 0)
 
-        self.reactionsbox = reactions(self.reactionText, self)
-        self.reactionsbox.grid(row = 2, column = 0)
+        self.reactionsBox = reactions(self.reactionText, self)
+        self.reactionsBox.grid(row = 2, column = 0)
         
     def __init__(self, duration, maxIterations, outputFreq, molVSList, moleculeText, reactionText, master=None):
         Frame.__init__(self, master)
@@ -204,9 +209,12 @@ class variablePicker(Toplevel):
     def createWidgets(self):
         #creates radiobuttons based on the variables that the user inputs
         molListChooserFrame = LabelFrame(self, text = "Choose Variables to Plot", padx = 80)
-        
+
+        #creates two lists to store the radiobuttons
         radioList1 = [0]*len(self.master.molCounts)
         radioList2 = [0]*len(self.master.molCounts)
+
+        #two variables to link to the radiobuttons that determine what should be plotted
         xAxis = StringVar()
         yAxis = StringVar()
         counter = 0
@@ -224,11 +232,15 @@ class variablePicker(Toplevel):
             radioList2[counter].grid(row = counter+1, column = 1, sticky = 'W')
             counter+=1
 
+        #adds an extra button to plot the time
         timeRadioButton = Radiobutton(molListChooserFrame, text = "Time", variable = xAxis, value = "time")
         timeRadioButton.grid(row=counter+1, column = 0, sticky = 'W')
+        
         submitButton = Button(molListChooserFrame, text = "Submit", command=lambda: self.submitVariables(xAxis, yAxis))
         submitButton.grid(row=counter+2, column = 0, sticky = 'W')
         molListChooserFrame.pack()
+
+        #prevents the window from closing immediately
         self.wait_window(self)
         
     def __init__(self, master=None):
@@ -245,9 +257,9 @@ class runControl(LabelFrame):
         #parses the inputs and runs the actual reaction
         
         #retrieves data from the entry fields
-        self.maxIterations = float(self.master.master.inputBox.parametersbox.iterationsEntry.get())
-        self.duration = float(self.master.master.inputBox.parametersbox.durationEntry.get())
-        self.outputFreq = float(self.master.master.inputBox.parametersbox.outputFreqEntry.get())
+        self.maxIterations = float(self.master.master.inputBox.parametersBox.iterationsEntry.get())
+        self.duration = float(self.master.master.inputBox.parametersBox.durationEntry.get())
+        self.outputFreq = float(self.master.master.inputBox.parametersBox.outputFreqEntry.get())
         
         self.master.analysisBox.textBox.config(state=NORMAL)
         self.master.analysisBox.textBox.insert('1.0', "Maximum Iterations:" + str(self.maxIterations)+"\n")
@@ -255,13 +267,13 @@ class runControl(LabelFrame):
         self.master.analysisBox.textBox.insert('3.0', "Duration:" + str(self.duration)+"\n")
         self.master.analysisBox.textBox.config(state=DISABLED)
 
-        self.moleculeText = self.master.master.inputBox.moleculesbox.textBox.get('1.0', 'end')
+        self.moleculeText = self.master.master.inputBox.moleculesBox.textBox.get('1.0', 'end')
         
         self.master.analysisBox.textBox.config(state=NORMAL)
         self.master.analysisBox.textBox.insert('1.0', self.moleculeText)
         self.master.analysisBox.textBox.config(state=DISABLED)
 
-        self.reactionText = self.master.master.inputBox.reactionsbox.textBox.get('1.0', 'end')
+        self.reactionText = self.master.master.inputBox.reactionsBox.textBox.get('1.0', 'end')
         
         self.master.analysisBox.textBox.config(state=NORMAL)
         self.master.analysisBox.textBox.insert('1.0', self.reactionText)
@@ -283,6 +295,11 @@ class runControl(LabelFrame):
         self.master.graphBox.destroyWidgets()
         self.master.graphBox.createWidgets()
 
+    def clearSimulation(self):
+        self.master.graphBox.graph = Figure(figsize = (5, 4), dpi=100)
+        self.master.graphBox.destroyWidgets()
+        self.master.graphBox.createWidgets()
+
     def createWidgets(self):
         self.seedLabel = Label(self, text = "Random Seed:")
         self.seedLabel.grid(row = 0, column = 0)
@@ -292,6 +309,9 @@ class runControl(LabelFrame):
 
         self.runButton = Button(self, text = "Run", command = lambda: self.runSimulation(self.graph))
         self.runButton.grid(row = 1, column = 0, sticky = "W")
+
+        self.clearButton = Button(self, text = "Clear", command = self.clearSimulation)
+        self.clearButton.grid(row = 1, column = 0, sticky = "E")
     def __init__(self, duration, maxIterations, rxnsAndMolCounts,
                   tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
         LabelFrame.__init__(self, master, text = "Run Control", padx = 5, pady = 5)
@@ -314,6 +334,7 @@ class graphDisplay(Frame):
     #displays the results of the reaction in graph form
     
     def createWidgets(self):
+        #displays the graph by embedding the matplotlib Figure into the GUI
         self.frame = Frame(self)
         self.frame.pack()
         self.canvas = FigureCanvasTkAgg(self.graph, master=self.frame)
@@ -324,6 +345,7 @@ class graphDisplay(Frame):
         self.toolbar.update()
         self.canvas._tkcanvas.pack(side="top", fill=BOTH, expand=1)
     def destroyWidgets(self):
+        #destroys the graph so it can be redrawn
         self.frame.destroy()
     def __init__(self, graph, master=None):
         Frame.__init__(self, master)
@@ -345,6 +367,100 @@ class analysis(LabelFrame):
         
         self.createWidgets()
 
+class menuBar(Menu):
+    def askFile(self):
+        #allows the user to enter a premade text file to fill out the forms
+        filename = tkFileDialog.askopenfilename()
+        file = open(filename, 'r')
+        strList = file.readlines()
+        index = 0
+        reactionText = ""
+        moleculeText = ""
+
+        #This determines the parameters, reactions, and molecule counts
+        #cycles through unimportant text until it finds the reactions
+        while("Reactions" not in strList[index]):
+            index+=1
+        #upon reaching the 'end', stops storing for reactionText
+        while("#" not in strList[index+1]):
+            index+=1
+            reactionText = reactionText+strList[index]
+        #cycles through unimportant text until it finds the molecule counts
+        while("Molecule Count of Reactants" not in strList[index]):
+            index+=1
+        #upon reaching the 'end', stops storing for moleculeText
+        while("#" not in strList[index+1]):
+            index+=1
+            moleculeText = moleculeText+strList[index]
+
+        #default values for parameters
+        duration = 30
+        maxIterations = 1000000
+        outputFreq=1000
+
+        optionalParams=[]
+        #cycles through unimportant text until it finds the optional parameters
+        while("Optional Parameters" not in strList[index]):
+            index+=1
+        #upon reaching the 'end', stops storing for optionalParams and begins to strip its contents
+        while(index<len(strList)-1):
+            index+=1
+            optionalParams.append(strList[index])
+            print(optionalParams)
+        #strips through the optional params in order to find the values of the parameters
+        for i in range(3):
+            for s in optionalParams[i].split('='):
+                if (s.rstrip()).isdigit():
+                    value = int(s)
+                    if(i==0):
+                        duration=value
+                    if(i==1):
+                        maxIterations=value
+                    if(i==2):
+                        outputFreq=value
+                    break
+        #sets the forms to equal the parameters and text that it found
+        self.master.app.inputBox.parametersBox.durationEntry.delete(0, 'end')
+        self.master.app.inputBox.parametersBox.iterationsEntry.delete(0, 'end')
+        self.master.app.inputBox.parametersBox.outputFreqEntry.delete(0, 'end')
+        self.master.app.inputBox.reactionsBox.textBox.delete('1.0', 'end')
+        self.master.app.inputBox.moleculesBox.textBox.delete('1.0', 'end')
+        self.master.app.inputBox.parametersBox.durationEntry.insert(0, duration)
+        self.master.app.inputBox.parametersBox.iterationsEntry.insert(0, maxIterations)
+        self.master.app.inputBox.parametersBox.outputFreqEntry.insert(0, outputFreq)
+        self.master.app.inputBox.reactionsBox.textBox.insert('1.0', reactionText)
+        self.master.app.inputBox.moleculesBox.textBox.insert('1.0', moleculeText)
+
+    def saveFile(self):
+        filename = tkFileDialog.asksaveasfile(mode='a')
+        duration = self.master.app.inputBox.parametersBox.durationEntry.get()
+        maxIterations = self.master.app.inputBox.parametersBox.iterationsEntry.get()
+        outputFreq = self.master.app.inputBox.parametersBox.outputFreqEntry.get()
+        reactionText = self.master.app.inputBox.reactionsBox.textBox.get('1.0', 'end')
+        moleculeText = self.master.app.inputBox.moleculesBox.textBox.get('1.0', 'end')
+
+        saveText = "#Reactions\n"+reactionText+"\n#Molecule Count of Reactants\n"+moleculeText+"\n#Optional Parameters\n"+"duration="+duration+"\nmax_iterations="+maxIterations+"\noutput_freq="+outputFreq
+        filename.write(saveText)
+    def createWidgets(self):
+        self.fileMenu = Menu(self, tearoff=0)
+        self.fileMenu.add_command(label = "Open", command = self.askFile)
+        self.fileMenu.add_command(label = "Save", command = self.saveFile)
+        self.fileMenu.add_separator()
+        self.fileMenu.add_command(label = "Exit", command = root.destroy)
+        self.add_cascade(label = "File", menu = self.fileMenu)
+
+        self.helpMenu = Menu(self, tearoff = 0)
+        self.helpMenu.add_command(label = "About CASS")
+        self.helpMenu.add_separator()
+        self.helpMenu.add_command(label = "CASS Help")
+        self.add_cascade(label = "Help", menu = self.helpMenu)
+        
+        self.master.config(menu=self)
+    def __init__(self, master):
+        Menu.__init__(self, master)
+        self.master = master
+        self.createWidgets()
+        
 root = Tk()
 root.resizable(FALSE, FALSE)
 #default values
@@ -358,25 +474,8 @@ molVSList = []
 moleculeText = ""
 reactionText = ""
 graph = Figure(figsize = (5, 4), dpi=100)
+version = 1.0
 
-app = Application(duration, maxIterations, rxnsAndMolCounts,
-                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=root)
-
-#creates the menu bar
-menuBar = Menu(root)
-
-fileMenu = Menu(menuBar, tearoff = 0)
-fileMenu.add_command(label = "Open")
-fileMenu.add_command(label = "Save")
-fileMenu.add_separator()
-fileMenu.add_command(label = "Exit", command = root.destroy)
-menuBar.add_cascade(label = "File", menu = fileMenu)
-
-helpMenu = Menu(menuBar, tearoff = 0)
-helpMenu.add_command(label = "About CASS")
-helpMenu.add_separator()
-helpMenu.add_command(label = "CASS Help")
-menuBar.add_cascade(label = "Help", menu = helpMenu)
-root.config(menu=menuBar)
-
-app.mainloop()
+root.app = Application(duration, maxIterations, rxnsAndMolCounts,
+                  tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, version, master=root)
+root.app.mainloop()
