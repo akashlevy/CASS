@@ -32,13 +32,13 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
                 if avgOn:
                     pylab.plot(listy, avgPlot(listy,listx))
                 pylab.xlabel("Time")
-                pylab.ylabel("%s Population"%(xN))
+                pylab.ylabel("%s"%(xN))
             else:
                 pylab.plot(listx,listy)
                 if avgOn:
                     pylab.plot(listx, avgPlot(listx,listy))
-                pylab.xlabel("%s Population"%(xN))
-                pylab.ylabel("%s Population"%(yN))
+                pylab.xlabel("%s"%(xN))
+                pylab.ylabel("%s"%(yN))
             #Constructs an average curve
             fig = pylab.gcf()
             fig.canvas.set_window_title('Computational Adaptable Stochastic Simulator')
