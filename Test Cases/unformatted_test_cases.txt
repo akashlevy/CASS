@@ -13,8 +13,6 @@ F -> 2N
 10Z -> D
 9O + 4N -> 3M + 11O
 
---------------------------Already Tested
-
 J/Q -> 3M
 J/3P -> N + M
 M*2PQ -> 5N
@@ -22,8 +20,6 @@ M*2PQ -> 5N
 R**2 -> S
 -3R**2 -> 3S
 (-3R)**2 -> 9S
-
-#for pi insert symbol
 
 pi*T + W -> 2W + U
 3U - 2T -> V

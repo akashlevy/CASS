@@ -1,6 +1,7 @@
 import CASSparser, CASSprocessor, CASSoutput#, CASSgui
 import argparse
 
+#CASS Version constant
 CASSVersion = "1.0"
 
 def main(argv=None):
@@ -75,11 +76,9 @@ def main(argv=None):
             duration = args.duration
         if args.seed != None:
             seed = args.seed
-        if args.silent:
-            output_freq = float('inf')
 
         #Calls processor
-        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, seed)
+        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, seed, args.silent)
 
     elif args.process != None:
         #Try to open data file
@@ -106,14 +105,12 @@ def main(argv=None):
             duration = args.duration
         if args.seed != None:
             seed = args.seed
-        if args.silent:
-            output_freq = float('inf')
         
         #Calls processor
-        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, seed)
+        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, seed, args.silent)
 
     else:
-        pass
+        print "Barry's GUI will run."
         #CASSgui.gui()
 
 main()

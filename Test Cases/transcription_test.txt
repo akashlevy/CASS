@@ -1,0 +1,11 @@
+D -> D + M [.01]
+M -> M + P [.1154]
+M -> [.00577]
+P -> [.0001925]
+P=0
+D=1
+M=0
+duration=(Insert Duration [secs]) default = 1000000
+max_iterations=(Insert Max Number of Iterations) default = 10000000
+output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 10000
+Plot P vs. time

@@ -1,0 +1,11 @@
+R->2R [10]
+R+W->2W [.01]
+W-> [10]
+
+R = 2000
+W = 1000
+
+duration=(Insert Duration [secs]) default = 10
+max_iterations=(Insert Max Number of Iterations) default = 100000
+output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 1000
+Plot R vs. W, W vs. R

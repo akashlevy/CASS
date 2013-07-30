@@ -21,30 +21,31 @@ class ProcessingError(Exception):
         print "The program will now exit."
         exit(1)
 
-def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, seed=1234213):
+def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, seed=1234213, silent=False):
     #Initialize variables
     rng.seed(seed)
     time = 0.0
     iteration = 0
 
-    #Prints parameters
-    print "Maximum Time: ", maxTime
-    print "Maximum number of Iterations: ", maxIterations
-    print "Output Frequency: ", outputFreq
-    print "Molecules: ",
-    for key in molCounts.keys():
-        print key,
-    print "\nPlots: ",
-    if molVSList != None:
-        for vs in molVSList:
-            if((vs[0] not in molCounts and "time" not in vs[0].lower()) or (vs[1] not in molCounts and "time" not in vs[1].lower())):
-                    raise ProcessingError("\nError - Plotting variables (%s) that do not exist"%("%s vs. %s"%(vs[0],vs[1])))
-            print "%s vs. %s,"%(vs[0],vs[1]),
+    if not silent:
+        #Prints parameters
+        print "Maximum Time: ", maxTime
+        print "Maximum number of Iterations: ", maxIterations
+        print "Output Frequency: ", outputFreq
+        print "Molecules: ",
+        for key in molCounts.keys():
+            print key,
+        print "\nPlots: ",
+        if molVSList != None:
+            for vs in molVSList:
+                if((vs[0] not in molCounts and "time" not in vs[0].lower()) or (vs[1] not in molCounts and "time" not in vs[1].lower())):
+                        raise ProcessingError("\nError - Plotting variables (%s) that do not exist"%("%s vs. %s"%(vs[0],vs[1])))
+                print "%s vs. %s,"%(vs[0],vs[1]),
 
-    #Processing message
-    print "\n------------------"
-    print "Processing..."
-    print "------------------"
+        #Processing message
+        print "\n------------------"
+        print "Processing..."
+        print "------------------"
     
     #Creates new directory and opens output files
     suffix=str(datetime.datetime.now()).replace(" ","_").replace(".","").replace(":","")
@@ -70,7 +71,8 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
             
         sump = sum(props)
         if (sump==0):
-            print "All reaction propensities have reached 0. The system has reached equilibrium"
+            if not args.silent:
+                print "All reaction propensities have reached 0. The system has reached equilibrium"
             break
         rand_1 = rng.random()
         tau = (1.0/sump * math.log(1.0/rand_1))
@@ -85,7 +87,7 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
         rxnChoice = tupleInputs[count-1][2] #dictionary of change in coefficients (Key=Molecule Name)
         molCounts = reactionUpdater(rxnChoice,molCounts)
         write_data_to_output(fileHandles, time, molCounts)
-        if (iteration % outputFreq == 0):
+        if (iteration % outputFreq == 0 and not silent):
             print "iteration %d   time %5.4g" % (iteration, time)   
         iteration += 1
 

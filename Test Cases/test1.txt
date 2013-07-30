@@ -1,0 +1,14 @@
+12air + glucose -> 6water + 6co2 [.01]
+air + 2h2 -> 2water [.005]
+2water + 3sucrose -> air + co2 [.03]
+sucrose + co2 -> glucose [.01]
+water = 1.23e+10
+air = 1.23e+10
+glucose = 1.23e+10
+h2 = = 1.23e+10
+co2 = 10000
+sucrose = 2.5e+8
+duration=(Insert Duration [secs]) default = 100
+max_iterations=(Insert Max Number of Iterations) default = 1000000
+output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 10000
+Plot sucrose vs. glucose, h2 vs. air, water vs. time

@@ -1,0 +1,9 @@
+C14 -> [1]
+ -> [180825048000]
+
+C14=1000000000000
+
+duration=(Insert Duration [secs]) default = 100000
+max_iterations=(Insert Max Number of Iterations) default = 1000000000
+output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 10000
+Plot C14 vs. time
