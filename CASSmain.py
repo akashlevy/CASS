@@ -22,7 +22,7 @@ def main(argv=None):
     args = parser.parse_args()
 
     if args.format_help:
-        #Format help
+        #Help on how to manually format your files
         print "Write equations in the following format (without < or >):"
         print "<Reactant1> + <Reactant2> + ... -> <Product1> + ... + <ProductN> [Reaction Rate]"
         print
@@ -48,12 +48,17 @@ def main(argv=None):
         fileOK = False
         while not fileOK:
             try:
-                print "Please enter your text file name:",
+                print "Please enter your text file name/path:",
                 fileName = str(raw_input())
-                dataFile = open(fileName + ".txt")
+                dataFile = open(fileName)
                 fileOK = True
             except IOError:
-                print "Error - File does not exist"
+                try:
+                    dataFile = open(fileName + ".txt")
+                    fileOK = True
+                except IOError:
+                    print "Error - File does not exist"
+                    exit(1)
 
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
@@ -76,10 +81,13 @@ def main(argv=None):
     elif args.process != None:
         #Try to open data file
         try:
-            dataFile = open(args.process + ".txt")
+            dataFile = open(args.process)
         except IOError:
-            print "Error - File does not exist."
-            exit(1)
+            try:
+                dataFile = open(args.process + ".txt")
+            except IOError:
+                print "Error - File does not exist."
+                exit(1)
 
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
