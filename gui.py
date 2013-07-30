@@ -11,6 +11,7 @@ from matplotlib.backend_bases import key_press_handler
 
 from matplotlib.figure import Figure
 
+#PRIORITY_TO_DO: Add molVSList dialog box
 #TO_DO: Add an Open file dialog box
 #TO_DO: Add About CASS and CASS Help pages
 #TO_DO: Remove submit buttons
@@ -131,12 +132,15 @@ class parameters(LabelFrame):
         self.outputFreqLabel.grid(row = 2, column = 0, sticky = 'W')
 
         self.iterationsEntry = Entry(self, width = 20)
+        self.iterationsEntry.insert(0, 1000000)
         self.iterationsEntry.grid(row = 0, column = 1)
 
         self.durationEntry = Entry(self, width = 20)
+        self.durationEntry.insert(0, 30)
         self.durationEntry.grid(row = 1, column = 1)
 
         self.outputFreqEntry = Entry(self, width = 20)
+        self.outputFreqEntry.insert(0, 1000)
         self.outputFreqEntry.grid(row = 2, column = 1)
 
         self.submitButton = Button(self, text = "Submit", command = lambda: self.getInputData(self.iterationsEntry, self.durationEntry, self.outputFreqEntry))
@@ -243,7 +247,7 @@ class runControl(LabelFrame):
         self.molListChooser = Toplevel(self)
         self.molListChooser.title("Variable Picker")
         self.molListChooser.resizable(FALSE, FALSE)
-        molListChooserFrame = LabelFrame(self.molListChooser, text = "Choose Variables to Plot", padx = 5)
+        molListChooserFrame = LabelFrame(self.molListChooser, text = "Choose Variables to Plot", padx = 80)
         
         radioList1 = [0]*len(molCounts)
         radioList2 = [0]*len(molCounts)
