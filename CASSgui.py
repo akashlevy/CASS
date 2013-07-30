@@ -30,7 +30,7 @@ class Application(Frame):
                   tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
         Frame.__init__(self, master, padx = 5, pady = 5)
         self.master = master
-        master.title("CASS")
+        master.title("Computational Adaptable Stochastic Simulator")
         self.pack()
 
         self.duration = duration
