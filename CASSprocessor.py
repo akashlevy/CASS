@@ -21,7 +21,7 @@ class ProcessingError(Exception):
         print "The program will now exit."
         sys.exit(1)
 
-def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, seed=124213):
+def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, seed=1234213):
     rng.seed(seed)
     time       = 0.0
     iteration  = 0
