@@ -3,6 +3,8 @@ import sys, argparse
 
 CASSVersion = "1.0"
 
+hybridMode=False
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.description = "CASS: Computational Adaptable Stochastic Simulator"
@@ -54,9 +56,6 @@ def main(argv=None):
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
 
-        #Calls processor
-        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
-
     elif args.process != None:
         #Override file specifications based on input arguments
         try:
@@ -75,13 +74,13 @@ def main(argv=None):
             output_freq = float('inf')
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
-
-        #Calls processor
-        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
-        CASSprocessor_Hybrid.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
-
+    
     else:
         pass
-        #barry's gui()
+    #Calls processor
+    if hybridMode:
+        return CASSprocessor_Hybrid.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
+    else
+        return CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
 
 main()
