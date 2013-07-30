@@ -52,10 +52,10 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
             pylab.close()
             figList.append(fig)
     
-        return figList
         print "********************"
         print "Simulation Complete - Check Folder for files"
         print "********************"
+        return figList
         
 
 def avgPlot(listx, listy):
