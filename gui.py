@@ -11,15 +11,14 @@ from matplotlib.backend_bases import key_press_handler
 
 from matplotlib.figure import Figure
 
-#PRIORITY_TO_DO: Add molVSList dialog box
 #TO_DO: Add an Open file dialog box
 #TO_DO: Add About CASS and CASS Help pages
-#TO_DO: Remove submit buttons
 
 class Application(Frame):
     #top level frame containing everything
     
     def createWidgets(self):
+        #contains an input box on the left containing fields, and an output box on the right containing the graph
         self.inputBox = variableInput(self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.moleculeText, self.reactionText, self)
         self.inputBox.pack(side = "left", fill=Y)
         
@@ -33,7 +32,7 @@ class Application(Frame):
         self.master = master
         master.title("CASS")
         self.pack()
-        
+
         self.duration = duration
         self.maxIterations = maxIterations
         self.rxnsAndMolCounts = rxnsAndMolCounts
@@ -51,6 +50,7 @@ class variableInput(Frame):
     #leftmost pane of GUI
     
     def createWidgets(self):
+        #creates 3 input sections, one for various datapoints like duration, one for the molcounts, and one for the reactions
         self.parametersbox = parameters(self.duration, self.maxIterations, self.outputFreq, self)
         self.parametersbox.grid(row = 0, column = 0, sticky = "WE")
 
@@ -77,6 +77,7 @@ class dataOutput(Frame):
     #rightmost pane of GUI
     
     def createWidgets(self):
+        #creates 3 sections, one that displays the graph, one that displays analysis box, and one that allows the user to run the program
         self.runBox = runControl(self.duration, self.maxIterations, self.rxnsAndMolCounts, self.tupleInputs,
                                self.molCounts, self.outputFreq, self.molVSList, self.moleculeText, self.reactionText, self.graph, self)
         self.runBox.grid(row = 1, column = 0, sticky = "WE")
@@ -107,21 +108,9 @@ class dataOutput(Frame):
 
 class parameters(LabelFrame):
     #allows the user to input iterations, duration, output frequency, and plotted variables and pass them to the master
-
-    def getInputData(self, iterationsEntry, durationEntry, outputFreqEntry):
-        #setting the maxIterations, outputFreq, and duration of the runBox
-        self.master.master.outputBox.runBox.maxIterations = float(iterationsEntry.get())
-        self.master.master.outputBox.runBox.outputFreq = float(outputFreqEntry.get())
-        self.master.master.outputBox.runBox.duration = float(durationEntry.get())
-
-        #setting the text of the analysis box to indicate the change
-        self.master.master.outputBox.analysisBox.textBox.config(state=NORMAL)
-        self.master.master.outputBox.analysisBox.textBox.insert('1.0', "Maximum Iterations:" + iterationsEntry.get()+"\n")
-        self.master.master.outputBox.analysisBox.textBox.insert('2.0', "Output Frequency:" + outputFreqEntry.get()+"\n")
-        self.master.master.outputBox.analysisBox.textBox.insert('3.0', "Duration:" + durationEntry.get()+"\n")
-        self.master.master.outputBox.analysisBox.textBox.config(state=DISABLED)
-
+    
     def createWidgets(self):
+        #creates 3 fields, one for maximum iterations, one for duration, and one for output frequency
         self.iterationsLabel = Label(self, text = "Iterations:")
         self.iterationsLabel.grid(row = 0, column = 0, sticky = 'W')
 
@@ -143,8 +132,6 @@ class parameters(LabelFrame):
         self.outputFreqEntry.insert(0, 1000)
         self.outputFreqEntry.grid(row = 2, column = 1)
 
-        self.submitButton = Button(self, text = "Submit", command = lambda: self.getInputData(self.iterationsEntry, self.durationEntry, self.outputFreqEntry))
-        self.submitButton.grid(row = 3, column = 0, sticky = 'W')
     def __init__(self, duration, maxIterations, outputFreq, master=None):
         LabelFrame.__init__(self, master, text = "Parameters", padx = 5, pady = 10)
         self.master = master
@@ -157,29 +144,19 @@ class parameters(LabelFrame):
         
 class molecules(LabelFrame):
     #allows the user to input molecounts and passes them up to the master
-    
-    def submitMolecules(self, textBox):
-        self.moleculeText = textBox.get('1.0', 'end')
-        #setting the moleculeText of the runBox
-        self.master.master.outputBox.runBox.moleculeText = self.moleculeText
-        #setting the text of the analysis box to indicate the change
-        self.master.master.outputBox.analysisBox.textBox.config(state=NORMAL)
-        self.master.master.outputBox.analysisBox.textBox.insert('1.0', self.moleculeText)
-        self.master.master.outputBox.analysisBox.textBox.config(state=DISABLED)
         
     def clearMolecules(self, textBox):
+        #clears the textbox and updates the data in runBox
         textBox.delete('1.0', 'end')
         self.moleculeText = textBox.get('1.0', 'end')
         self.master.master.outputBox.runBox.moleculeText = self.moleculeText
         
     def createWidgets(self):
+        #creates a textbox for the user to enter molcounts
         self.textBox = Text(self, width = 40, height = 10)
         self.textBox.pack()
 
-        #using lambda allows arguments to be passed to submitMolecules method
-        self.submitButton = Button(self, text = "Submit", command = lambda: self.submitMolecules(self.textBox))
-        self.submitButton.pack(pady = 5, side = "left")
-
+        #using lambda allows arguments to be passed to method
         self.clearButton = Button(self, text = "Clear", command = lambda: self.clearMolecules(self.textBox))
         self.clearButton.pack(pady = 5, padx = 5, side = "left")
         
@@ -192,28 +169,19 @@ class molecules(LabelFrame):
 
 class reactions(LabelFrame):
     #allows the user to input reactions and passes them up to the master
-    
-    def submitReactions(self, textBox):
-        self.reactionText = textBox.get('1.0', 'end')
-        #setting the reactionText of the runBox
-        self.master.master.outputBox.runBox.reactionText = self.reactionText
-        #setting the text of the analysis box to indicate the change
-        self.master.master.outputBox.analysisBox.textBox.config(state=NORMAL)
-        self.master.master.outputBox.analysisBox.textBox.insert('1.0', self.reactionText)
-        self.master.master.outputBox.analysisBox.textBox.config(state=DISABLED)
 
     def clearReactions(self, textBox):
+        #clears the textbox and updates the data in runBox
         textBox.delete('1.0', 'end')
         self.reactionText = textBox.get('1.0', 'end')
         self.master.master.outputBox.runBox.reactionText = self.reactionText
         
     def createWidgets(self):
+        #creates a textbox for the user to enter reactions
         self.textBox = Text(self, width = 40, height = 10)
         self.textBox.pack()
         
-        self.submitButton = Button(self, text = "Submit", command = lambda: self.submitReactions(self.textBox))
-        self.submitButton.pack(pady = 5, side = "left")
-
+        #using lambda allows arguments to be passed to method
         clearButton = Button(self, text = "Clear", command = lambda: self.clearReactions(self.textBox))
         clearButton.pack(pady = 5, padx = 5, side = "left")
     def __init__(self, reactionText, master=None):
@@ -223,34 +191,22 @@ class reactions(LabelFrame):
         self.reactionText = reactionText
         self.createWidgets()
 
-class runControl(LabelFrame):
-    #allows the user to input a seed and run the reaction
-
+class variablePicker(Toplevel):
+    #allows the user to choose their variables
+    
     def submitVariables(self, xAxis, yAxis):
-        #Consider wrapping in separate class
+        #creates a molVSList based on the user's selections
         x = xAxis.get()
         y = yAxis.get()
-        self.molVSList = [(x, y), (y, x)]
-        print("molVSList:", self.molVSList)
-        self.molListChooser.destroy()
+        self.master.molVSList = [(x, y), (y, x)]
+        self.destroy()
         
-    def runSimulation(self, duration, maxIterations, rxnsAndMolCounts, tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph):
-        #parses the inputs and runs the actual reaction
-        rxnsAndMolCounts = (reactionText+moleculeText).splitlines()
-        EqnsNmolCounts = CASSparser.parseText(rxnsAndMolCounts)
-        tupleInputs = EqnsNmolCounts[0]
-        molCounts = EqnsNmolCounts[1]
-        self.molVSList = molVSList
-
-        #choosing the lists of variables to plot
-        #Consider wrapping in separate class
-        self.molListChooser = Toplevel(self)
-        self.molListChooser.title("Variable Picker")
-        self.molListChooser.resizable(FALSE, FALSE)
-        molListChooserFrame = LabelFrame(self.molListChooser, text = "Choose Variables to Plot", padx = 80)
+    def createWidgets(self):
+        #creates radiobuttons based on the variables that the user inputs
+        molListChooserFrame = LabelFrame(self, text = "Choose Variables to Plot", padx = 80)
         
-        radioList1 = [0]*len(molCounts)
-        radioList2 = [0]*len(molCounts)
+        radioList1 = [0]*len(self.master.molCounts)
+        radioList2 = [0]*len(self.master.molCounts)
         xAxis = StringVar()
         yAxis = StringVar()
         counter = 0
@@ -260,21 +216,67 @@ class runControl(LabelFrame):
         yAxisLabel = Label(molListChooserFrame, text = "Y Axis")
         yAxisLabel.grid(row = 0, column = 1)
         
-        for key in molCounts.keys():
+        for key in self.master.molCounts.keys():
             print(counter)
             radioList1[counter] = Radiobutton(molListChooserFrame, text = key, variable = xAxis, value = key)
-            radioList1[counter].grid(row = counter+1, column = 0)
+            radioList1[counter].grid(row = counter+1, column = 0, sticky = 'W')
             radioList2[counter] = Radiobutton(molListChooserFrame, text = key, variable = yAxis, value = key)
-            radioList2[counter].grid(row = counter+1, column = 1)
+            radioList2[counter].grid(row = counter+1, column = 1, sticky = 'W')
             counter+=1
+
+        timeRadioButton = Radiobutton(molListChooserFrame, text = "Time", variable = xAxis, value = "time")
+        timeRadioButton.grid(row=counter+1, column = 0, sticky = 'W')
         submitButton = Button(molListChooserFrame, text = "Submit", command=lambda: self.submitVariables(xAxis, yAxis))
-        submitButton.grid(row=counter+1, column = 0)
+        submitButton.grid(row=counter+2, column = 0, sticky = 'W')
         molListChooserFrame.pack()
-        self.wait_window(self.molListChooser)
+        self.wait_window(self)
+        
+    def __init__(self, master=None):
+        Toplevel.__init__(self, master)
+        self.title("Variable Picker")
+        self.master = master
+        self.resizable(FALSE, FALSE)
+        self.createWidgets()
+        
+class runControl(LabelFrame):
+    #allows the user to input a seed and run the reaction
+
+    def runSimulation(self, graph):
+        #parses the inputs and runs the actual reaction
+        
+        #retrieves data from the entry fields
+        self.maxIterations = float(self.master.master.inputBox.parametersbox.iterationsEntry.get())
+        self.duration = float(self.master.master.inputBox.parametersbox.durationEntry.get())
+        self.outputFreq = float(self.master.master.inputBox.parametersbox.outputFreqEntry.get())
+        
+        self.master.analysisBox.textBox.config(state=NORMAL)
+        self.master.analysisBox.textBox.insert('1.0', "Maximum Iterations:" + str(self.maxIterations)+"\n")
+        self.master.analysisBox.textBox.insert('2.0', "Output Frequency:" + str(self.outputFreq)+"\n")
+        self.master.analysisBox.textBox.insert('3.0', "Duration:" + str(self.duration)+"\n")
+        self.master.analysisBox.textBox.config(state=DISABLED)
+
+        self.moleculeText = self.master.master.inputBox.moleculesbox.textBox.get('1.0', 'end')
+        
+        self.master.analysisBox.textBox.config(state=NORMAL)
+        self.master.analysisBox.textBox.insert('1.0', self.moleculeText)
+        self.master.analysisBox.textBox.config(state=DISABLED)
+
+        self.reactionText = self.master.master.inputBox.reactionsbox.textBox.get('1.0', 'end')
+        
+        self.master.analysisBox.textBox.config(state=NORMAL)
+        self.master.analysisBox.textBox.insert('1.0', self.reactionText)
+        self.master.analysisBox.textBox.config(state=DISABLED)
+
+        #parses data to retrieve fields to input into processor
+        self.rxnsAndMolCounts = (self.reactionText+self.moleculeText).splitlines()
+        EqnsNmolCounts = CASSparser.parseText(self.rxnsAndMolCounts)
+        self.tupleInputs = EqnsNmolCounts[0]
+        self.molCounts = EqnsNmolCounts[1]
+
+        self.top = variablePicker(self)
         
         #Calls processor
-        print("molVSList:", self.molVSList)
-        self.master.graphBox.graph = CASSprocessor.updateAll(tupleInputs, molCounts, duration, maxIterations, outputFreq, self.molVSList)
+        self.master.graphBox.graph = CASSprocessor.updateAll(self.tupleInputs, self.molCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList)
         self.master.analysisBox.textBox.config(state=NORMAL)
         self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
         self.master.analysisBox.textBox.config(state=DISABLED)
@@ -288,9 +290,7 @@ class runControl(LabelFrame):
         self.seedEntry = Entry(self, width = 20)
         self.seedEntry.grid(row = 0, column = 1)
 
-        self.runButton = Button(self, text = "Run", command = lambda: self.runSimulation(self.duration, self.maxIterations, self.rxnsAndMolCounts, self.tupleInputs,
-                                                                                    self.molCounts, self.outputFreq, self.molVSList, self.moleculeText,
-                                                                                    self.reactionText, self.graph))
+        self.runButton = Button(self, text = "Run", command = lambda: self.runSimulation(self.graph))
         self.runButton.grid(row = 1, column = 0, sticky = "W")
     def __init__(self, duration, maxIterations, rxnsAndMolCounts,
                   tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
