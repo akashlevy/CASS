@@ -20,10 +20,9 @@
 
 #- Output files will be saved in (ReactantName).dat
 
+(4**2)air + glucose -> 6water + 6co2 [.01]
 
-(4**2)air + glucose -> water + (7**2)co2 [.01]
-
-(adfjaslkdjfk)air + 2h2 -> 2water [.005]
+air + 2h2 -> 2water [.005]
 
 2water + 3sucrose -> air + co2 [.03]
 

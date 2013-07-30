@@ -79,7 +79,7 @@ def main(argv=None):
             dataFile = open(args.process + ".txt")
         except IOError:
             print "Error - File does not exist."
-            exit()
+            exit(1)
 
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
@@ -96,8 +96,9 @@ def main(argv=None):
         if args.silent:
             output_freq = float('inf')
 
+        print args.process
         #Calls processor
-        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, args.process)
+        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, args.process)
 
     else:
         pass

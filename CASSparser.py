@@ -1,5 +1,5 @@
 #Import regular expression library and sys for exit()
-import re, sys
+import re
 
 #Exception that is raised when an error is found during parsing
 class ParsingSyntaxError(Exception):
@@ -8,7 +8,7 @@ class ParsingSyntaxError(Exception):
         print string
         print
         print "The program will now exit."
-        sys.exit(1)
+        exit(1)
 
 #Check if all characters are matched
 def notAllMatched(inputString, matches):
@@ -99,6 +99,11 @@ def parseText(inputStrings):
     ,?
     \s*
     """
+    regExpEval = """
+    (\(                             #Find open parenthesis
+    [^\(]+                          #Match characters until close parenthesis
+    \))                             #Find close parenthesis
+    """
 
     #Remove exclusively newline character lines
     inputStrings = filter(lambda a: a != "\n", inputStrings)
@@ -107,7 +112,16 @@ def parseText(inputStrings):
         #If line is a comment or a blank line, ignore it
         if re.match("#", line) or re.search("\S", line) == None:
             continue
-        
+
+        #Evaluate all expressions within parentheses
+        evalMatches = list(re.finditer(regExpEval, line, re.VERBOSE))
+        for match in evalMatches:
+            try:
+                line = line.replace(match.group(1), str(eval(match.group(1))))
+            except Exception as e:
+                print "ERROR: " + e.args[0]
+                exit(1)
+            
         #Define outputs
         reactants = {}
         products = {}
