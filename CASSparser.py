@@ -40,6 +40,7 @@ def parseText(inputStrings):
     max_iterations = 1000000
     output_freq = 10000
     plots = []
+    seed = 1234231
     
     #Regular expressions to parse equations
     regExpEqPlus = """
@@ -222,6 +223,8 @@ def parseText(inputStrings):
                 max_iterations = moleCount
                 if max_iterations <= 0:
                     raise ParsingSyntaxError("ERROR: The maximum iterations specified in line " + str(i+1) + "must be positive:\n" + line)
+            elif elementName == "seed":
+                seed = moleCount
             elif elementName == "output_freq":
                 output_freq = moleCount
                 if output_freq <= 0:
@@ -233,4 +236,4 @@ def parseText(inputStrings):
         elif lineType == "plot":
             for match in plotArgsMatches:
                 plots.append([match.group(1), match.group(2)])
-    return equations, moleCounts, duration, max_iterations, output_freq, plots
+    return equations, moleCounts, duration, max_iterations, output_freq, plots, seed

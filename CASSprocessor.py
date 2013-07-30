@@ -21,8 +21,8 @@ class ProcessingError(Exception):
         print "The program will now exit."
         sys.exit(1)
 
-def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, inputName= None):
-    rng.seed(124213)
+def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, seed=124213):
+    rng.seed(seed)
     time       = 0.0
     iteration  = 0
 
@@ -30,7 +30,6 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
     print "Maximum Time: ",maxTime
     print "Maximum number of Iterations: ", maxIterations
     print "Output Frequency: ", outputFreq
-    print "Input File Name: ", inputName
     print "Molecules: ",
     for key in molCounts.keys():
         print key,

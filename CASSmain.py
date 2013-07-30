@@ -18,6 +18,7 @@ def main(argv=None):
     parser.add_argument("-ng", "--no-graphs", action = "store_true", help = "Don't display graphs after done processing (off by default)")
     parser.add_argument("-p", "--process", metavar = "FILE", help = "Specify a file to process")
     parser.add_argument("-s", "--silent", action = "store_true", help = "Don't display output while processing")
+    parser.add_argument("-sd", "--seed", metavar = "NUM", help = "Specify a seed to run the simulation with")
     parser.add_argument("-v", "--version", action = "version", version = parser.prog + "_" + CASSVersion)
     args = parser.parse_args()
 
@@ -61,7 +62,7 @@ def main(argv=None):
                     exit(1)
 
         #Calls parser        
-        equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
+        equations, moleCounts, duration, max_iterations, output_freq, plots, seed = CASSparser.parseText(dataFile.readlines())
         
         #Override file specifications based on input arguments
         if args.no_graphs:
@@ -72,11 +73,13 @@ def main(argv=None):
             max_iterations = args.max_iters
         if args.duration > 0:
             duration = args.duration
+        if args.seed != None:
+            seed = args.seed
         if args.silent:
             output_freq = float('inf')
 
         #Calls processor
-        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
+        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, seed)
 
     elif args.process != None:
         #Try to open data file
@@ -90,7 +93,7 @@ def main(argv=None):
                 exit(1)
 
         #Calls parser        
-        equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
+        equations, moleCounts, duration, max_iterations, output_freq, plots, seed = CASSparser.parseText(dataFile.readlines())
 
         #Override file specifications based on input arguments
         if args.no_graphs:
@@ -101,12 +104,13 @@ def main(argv=None):
             max_iterations = args.max_iters
         if args.duration > 0:
             duration = args.duration
+        if args.seed != None:
+            seed = args.seed
         if args.silent:
             output_freq = float('inf')
-
-        print args.process
+        
         #Calls processor
-        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, args.process)
+        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, seed)
 
     else:
         pass
