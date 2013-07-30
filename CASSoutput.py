@@ -41,11 +41,12 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
                 pylab.ylabel("%s Population"%(yN))
             #Constructs an average curve
             fig = pylab.gcf()
-            fig.canvas.set_window_title('Computational Adaptable Stochastic Simulator')
-            fig.setsize(6,5)
+            fig.canvas.set_window_title('Computational Adaptable Stochastic Simulator')   
+           
             path = str(os.getcwd()) + "\\Results_" + suffix
             name =("%s_Plot_%s.png"%(title1,suffix))
             fig.savefig(os.path.join(path,name),dpi=100)
+            fig.set_size_inches(6, 5)
             pylab.show()
             print "Check newly opened window for plots (Close window for next)"
             pylab.close()
