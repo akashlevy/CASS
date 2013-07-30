@@ -96,9 +96,9 @@ def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSL
     end_time = tm.time()
 
     #Display time elapsed
-    #if(molVSList != None):
+    if(molVSList != None):
     #    print "Time Elapsed = " + str(end_time - start_time)
-    #    return CASSoutput.graphResults(fileHandles,molCounts,molVSList,suffix)
+        return CASSoutput.graphResults(fileHandles,molCounts,molVSList,suffix)
 
 
 #Takes one tuple and returns propensity based on Gillespie Algorithm   
