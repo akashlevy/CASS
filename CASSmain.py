@@ -1,11 +1,10 @@
-import CASSparser, CASSprocessor, CASSprocessor_Hybrid, CASSoutput
+import CASSparser, CASSprocessor, CASSoutput
 import sys, argparse
 
 CASSVersion = "1.0"
 
-hybridMode=False
-
 def main(argv=None):
+    #Parse arguments
     parser = argparse.ArgumentParser()
     parser.description = "CASS: Computational Adaptable Stochastic Simulator"
     parser.epilog = "Without any arguments, the GUI will open."
@@ -19,10 +18,11 @@ def main(argv=None):
     parser.add_argument("-ng", "--no-graphs", action = "store_true", help = "Don't display graphs after done processing (off by default)")
     parser.add_argument("-p", "--process", metavar = "FILE", help = "Specify a file to process")
     parser.add_argument("-s", "--silent", action = "store_true", help = "Don't display output while processing")
-    parser.add_argument("-v", "--version", action = "version", version = parser.prog + " " + CASSVersion)
+    parser.add_argument("-v", "--version", action = "version", version = parser.prog + "_" + CASSVersion)
     args = parser.parse_args()
 
     if args.format_help:
+        #Format help
         print "Write equations in the following format (without < or >):"
         print "<Reactant1> + <Reactant2> + ... -> <Product1> + ... + <ProductN> [Reaction Rate]"
         print
@@ -35,7 +35,8 @@ def main(argv=None):
         print "Plot <Reactant1> vs. <Reactant2>, <Reactant1> vs. <Time> ..."
         sys.exit(0)
 
-    elif args.interactive:   
+    elif args.interactive:
+        #Welcome output
         print "****************************"
         print "******Welcome to CASS!******"
         print "****************************"
@@ -43,10 +44,11 @@ def main(argv=None):
         print "-Make sure your file is in the correct format (See Documentation)"
         print "-Verify that the file is in the current working directory\n"
 
+        #Try to open data file
         fileOK = False
         while not fileOK:
             try:
-                print "Please enter your text file name (do not include .txt):",
+                print "Please enter your text file name:",
                 fileName = str(raw_input())
                 dataFile = open(fileName + ".txt")
                 fileOK = True
@@ -55,13 +57,8 @@ def main(argv=None):
 
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
-
-    elif args.process != None:
+        
         #Override file specifications based on input arguments
-        try:
-            dataFile = open(args.process + ".txt")
-        except IOError:
-            print "Error - File does not exist."
         if args.no_graphs:
             plots = None
         if args.output_freq > 0:
@@ -72,15 +69,38 @@ def main(argv=None):
             duration = args.duration
         if args.silent:
             output_freq = float('inf')
+
+        #Calls processor
+        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
+
+    elif args.process != None:
+        #Try to open data file
+        try:
+            dataFile = open(args.process + ".txt")
+        except IOError:
+            print "Error - File does not exist."
+            exit()
+
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots = CASSparser.parseText(dataFile.readlines())
-    
+
+        #Override file specifications based on input arguments
+        if args.no_graphs:
+            plots = None
+        if args.output_freq > 0:
+            output_freq = args.output_freq
+        if args.max_iters > 0:
+            max_iterations = args.max_iters
+        if args.duration > 0:
+            duration = args.duration
+        if args.silent:
+            output_freq = float('inf')
+
+        #Calls processor
+        CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, args.process)
+
     else:
         pass
-    #Calls processor
-    if hybridMode:
-        return CASSprocessor_Hybrid.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
-    else
-        return CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
+        #barry's gui()
 
 main()
