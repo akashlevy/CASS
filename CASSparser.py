@@ -139,9 +139,6 @@ def parseText(inputStrings):
         plotMatches = list(re.finditer(regExpPlot, line, re.VERBOSE|re.IGNORECASE))
         plotArgsMatches = list(re.finditer(regExpPlotArgs, line, re.VERBOSE))
 
-        #for match in eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches + plotMatches + plotArgsMatches:
-        #    print match.groups(), match.start(), match.end()
-
         #Check for errors
         if len(eqArrowMatches) > 1:
             raise ParsingSyntaxError("ERROR: The parser found more than one arrow in line " + str(i+1) + ":\n" + line)        
@@ -210,6 +207,7 @@ def parseText(inputStrings):
                 netChange[reactant] = products[reactant] - reactants[reactant]
             equations.append((constant, reactants, netChange))
         elif lineType == "declaration":
+            #Check whether the declaration is an argument or a moleCount
             try:
                 moleCount = float(declarationMatches[0].group(2))
             except ValueError as e:
@@ -234,6 +232,8 @@ def parseText(inputStrings):
                     raise ParsingSyntaxError("ERROR: The molecule count in line " + str(i+1) + "is negative:\n" + line)
                 moleCounts[elementName] = moleCount
         elif lineType == "plot":
+            #Create list of plots
             for match in plotArgsMatches:
                 plots.append([match.group(1), match.group(2)])
+    
     return equations, moleCounts, duration, max_iterations, output_freq, plots, seed

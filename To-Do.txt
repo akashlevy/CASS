@@ -3,6 +3,5 @@ Make output to file (fix the error where it only works with idle)
 Package
 Make work on different platforms
 Paper
-Comments
 Tests
-Barry - Open, Save, About, Help, Plot without recalculate, Rename CASSgui.py
+Barry - About, Plot without recalculate

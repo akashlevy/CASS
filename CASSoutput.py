@@ -1,14 +1,20 @@
 import math, os, numpy, pylab, sys, datetime
 
-def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
+def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False, silent=False):
+    #Initialize lists
     fileNames = []
     figList =[]
-    print "*******************"
-    print "Generating Plots..."
-    print "(This may take a few minutes)"
-    print "*******************"
+    
+    if not silent:
+        #Print message
+        print "*******************"
+        print "Generating Plots..."
+        print "(This may take a few minutes)"
+        print "*******************"
+
+    #Draw each graph
     if(molVSList!=None):
-        count=0
+        count = 0
         for i in range(len(molVSList)):
             xN=molVSList[i][0]
             yN=molVSList[i][1]
@@ -16,7 +22,7 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
             poly = []
             while("time" in molVSList[i][j]):
                 j+=1
-            listTime=readInTime("%s.dat"%molVSList[i][j], suffix)
+            listTime = readInTime("%s.dat"%molVSList[i][j], suffix)
             if("time" in xN.lower()):
                 listx=listTime
             else:
@@ -48,12 +54,13 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
             fig.savefig(os.path.join(path,name),dpi=100)
             fig.set_size_inches(6, 5)
             figList.append(fig)
-            print "********************"
-            print "Simulation Complete - Check Folder for files"
-            print "********************"
+            if not silent:
+                print "********************"
+                print "Simulation Complete - Check Folder for files"
+                print "********************"
             return fig
         
-
+#Plots the average
 def avgPlot(listx, listy):
     intListX = [int(float(x)) for x in listx]
     intListY = [int(float(y)) for y in listy]
@@ -66,8 +73,7 @@ def avgPlot(listx, listy):
             tempY+=poly[p]*x**(len(poly)-1-p)
         newY.append(tempY)
     return newY
-            
-            
+
 #Reads the created files for plotting (specific for time variable)
 def readInTime(fileName, suffix):
     list1=[]

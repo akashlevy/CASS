@@ -12,12 +12,12 @@ def main(argv=None):
     parser.prog = "cass"
     parser.conflict_handler = "resolve"
     parser.add_argument("-d", "--duration", metavar = "TIME", type = int, default = -1, help = "Manually specify a duration")
+    parser.add_argument("-f", "--file", metavar = "FILE", help = "Specify a file to process")
     parser.add_argument("-fh", "--format-help", action = "store_true", help = "Display help on how to format your input files")
     parser.add_argument("-i", "--interactive", action = "store_true", help = "Interactive mode (off by default)")
     parser.add_argument("-mi", "--max-iters", metavar = "ITERS", type = int, default = -1, help = "Manually specify a maximum number of iterations")
     parser.add_argument("-of", "--output-freq", metavar = "FREQ", type = int, default = -1, help = "Manually specify a maximum number of iterations")
     parser.add_argument("-ng", "--no-graphs", action = "store_true", help = "Don't display graphs after done processing (off by default)")
-    parser.add_argument("-p", "--process", metavar = "FILE", help = "Specify a file to process")
     parser.add_argument("-s", "--silent", action = "store_true", help = "Don't display output while processing")
     parser.add_argument("-sd", "--seed", metavar = "NUM", help = "Specify a random seed to run the simulation with")
     parser.add_argument("-v", "--version", action = "version", version = parser.prog + "_" + CASSVersion)
@@ -80,13 +80,13 @@ def main(argv=None):
         #Calls processor
         CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, seed, args.silent)
 
-    elif args.process != None:
+    elif args.file != None:
         #Try to open data file
         try:
-            dataFile = open(args.process)
+            dataFile = open(args.file)
         except IOError:
             try:
-                dataFile = open(args.process + ".txt")
+                dataFile = open(args.file + ".txt")
             except IOError:
                 print "Error - File does not exist."
                 exit(1)
