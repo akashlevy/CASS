@@ -32,7 +32,7 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
                 if avgOn:
                     pylab.plot(listy, avgPlot(listy,listx))
                 pylab.xlabel("Time")
-                pylab.ylabel("%s Population"%(xN))
+                pylab.ylabel("%s"%(xN))
             else:
                 pylab.plot(listx,listy)
                 if avgOn:
