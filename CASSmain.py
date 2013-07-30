@@ -1,4 +1,4 @@
-import CASSparser, CASSprocessor, CASSoutput
+import CASSparser, CASSprocessor, CASSprocessor_Hybrid, CASSoutput
 import sys, argparse
 
 CASSVersion = "1.0"
@@ -78,6 +78,7 @@ def main(argv=None):
 
         #Calls processor
         CASSprocessor.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
+        CASSprocessor_Hybrid.updateAll(equations, moleCounts, duration, max_iterations, output_freq, plots, fileName)
 
     else:
         pass
