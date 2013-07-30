@@ -1,0 +1,14 @@
+#Reactions
+R->2R[10]
+R+W->2W[.01]
+W->[10]
+
+#Molecule Count of Reactants
+R=2000
+W=1000
+
+#Optional Parameters
+duration = 10
+iterations = 1000000
+outputFreq = 1000
+seed = 12341234
