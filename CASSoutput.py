@@ -37,8 +37,8 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
                 pylab.plot(listx,listy)
                 if avgOn:
                     pylab.plot(listx, avgPlot(listx,listy))
-                pylab.xlabel("%s Population"%(xN))
-                pylab.ylabel("%s Population"%(yN))
+                pylab.xlabel("%s"%(xN))
+                pylab.ylabel("%s"%(yN))
             #Constructs an average curve
             fig = pylab.gcf()
             fig.canvas.set_window_title('Computational Adaptable Stochastic Simulator')   
@@ -47,15 +47,11 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False):
             name =("%s_Plot_%s.png"%(title1,suffix))
             fig.savefig(os.path.join(path,name),dpi=100)
             fig.set_size_inches(6, 5)
-            pylab.show()
-            print "Check newly opened window for plots (Close window for next)"
-            pylab.close()
             figList.append(fig)
-    
-        print "********************"
-        print "Simulation Complete - Check Folder for files"
-        print "********************"
-        return figList
+            print "********************"
+            print "Simulation Complete - Check Folder for files"
+            print "********************"
+            return fig
         
 
 def avgPlot(listx, listy):
