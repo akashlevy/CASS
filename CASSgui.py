@@ -203,6 +203,11 @@ class variablePicker(Toplevel):
         x = xAxis.get()
         y = yAxis.get()
         self.master.molVSList = [(x, y), (y, x)]
+        self.master.runProcessor = True
+        self.destroy()
+
+    def cancelChoice(self):
+        self.master.runProcessor = False
         self.destroy()
         
     def createWidgets(self):
@@ -237,6 +242,8 @@ class variablePicker(Toplevel):
         
         submitButton = Button(molListChooserFrame, text = "Submit", command=lambda: self.submitVariables(xAxis, yAxis))
         submitButton.grid(row=counter+2, column = 0, sticky = 'W')
+        cancelButton = Button(molListChooserFrame, text = "Cancel", command=self.cancelChoice)
+        cancelButton.grid(row=counter+2, column = 0, sticky = 'E')
         molListChooserFrame.pack()
 
         #prevents the window from closing immediately
@@ -259,30 +266,13 @@ class runControl(LabelFrame):
         self.maxIterations = float(self.master.master.inputBox.parametersBox.iterationsEntry.get())
         self.duration = float(self.master.master.inputBox.parametersBox.durationEntry.get())
         self.outputFreq = float(self.master.master.inputBox.parametersBox.outputFreqEntry.get())
-        
-        self.master.analysisBox.textBox.config(state=NORMAL)
-        self.master.analysisBox.textBox.insert('1.0', "Maximum Iterations:" + str(self.maxIterations)+"\n")
-        self.master.analysisBox.textBox.insert('2.0', "Output Frequency:" + str(self.outputFreq)+"\n")
-        self.master.analysisBox.textBox.insert('3.0', "Duration:" + str(self.duration)+"\n")
-        self.master.analysisBox.textBox.config(state=DISABLED)
 
         self.moleculeText = self.master.master.inputBox.moleculesBox.textBox.get('1.0', 'end')
-        
-        self.master.analysisBox.textBox.config(state=NORMAL)
-        self.master.analysisBox.textBox.insert('1.0', self.moleculeText)
-        self.master.analysisBox.textBox.config(state=DISABLED)
 
         self.reactionText = self.master.master.inputBox.reactionsBox.textBox.get('1.0', 'end')
         
-        self.master.analysisBox.textBox.config(state=NORMAL)
-        self.master.analysisBox.textBox.insert('1.0', self.reactionText)
-        self.master.analysisBox.textBox.config(state=DISABLED)
-
         self.seed = int(self.seedEntry.get())
 
-        self.master.analysisBox.textBox.config(state=NORMAL)
-        self.master.analysisBox.textBox.insert('1.0', "Seed:"+str(self.seed))
-        self.master.analysisBox.textBox.config(state=DISABLED)
 
         #parses data to retrieve fields to input into processor
         self.rxnsAndMolCounts = (self.reactionText+self.moleculeText).splitlines()
@@ -291,14 +281,24 @@ class runControl(LabelFrame):
         self.molCounts = EqnsNmolCounts[1]
 
         self.top = variablePicker(self)
-        
-        #Calls processor
-        self.master.graphBox.graph = CASSprocessor.updateAll(self.tupleInputs, self.molCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed)
-        self.master.analysisBox.textBox.config(state=NORMAL)
-        self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
-        self.master.analysisBox.textBox.config(state=DISABLED)
-        self.master.graphBox.destroyWidgets()
-        self.master.graphBox.createWidgets()
+
+        if(self.runProcessor):
+            self.master.analysisBox.textBox.config(state=NORMAL)
+            self.master.analysisBox.textBox.insert('1.0', "Maximum Iterations:" + str(self.maxIterations)+"\n")
+            self.master.analysisBox.textBox.insert('2.0', "Output Frequency:" + str(self.outputFreq)+"\n")
+            self.master.analysisBox.textBox.insert('3.0', "Duration:" + str(self.duration)+"\n")
+            self.master.analysisBox.textBox.insert('1.0', self.moleculeText)
+            self.master.analysisBox.textBox.insert('1.0', self.reactionText)
+            self.master.analysisBox.textBox.insert('1.0', "Seed:"+str(self.seed))
+            self.master.analysisBox.textBox.config(state=DISABLED)
+            
+            #Calls processor
+            self.master.graphBox.graph = CASSprocessor.updateAll(self.tupleInputs, self.molCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed)
+            self.master.analysisBox.textBox.config(state=NORMAL)
+            self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
+            self.master.analysisBox.textBox.config(state=DISABLED)
+            self.master.graphBox.destroyWidgets()
+            self.master.graphBox.createWidgets()
 
     def clearSimulation(self):
         self.master.graphBox.graph = Figure(figsize = (5, 4), dpi=100)
@@ -334,6 +334,7 @@ class runControl(LabelFrame):
         self.moleculeText = moleculeText
         self.reactionText = reactionText
         self.graph = graph
+        self.runProcessor = False #determines whether or not the graph is actually created and data is actually organized
         
         self.createWidgets()
 
