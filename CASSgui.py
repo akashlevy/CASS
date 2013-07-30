@@ -14,7 +14,6 @@ from matplotlib.backend_bases import key_press_handler
 
 from matplotlib.figure import Figure
 
-#TO_DO: Add an Open file dialog box
 #TO_DO: Add About CASS and CASS Help pages
 
 class Application(Frame):
@@ -279,6 +278,12 @@ class runControl(LabelFrame):
         self.master.analysisBox.textBox.insert('1.0', self.reactionText)
         self.master.analysisBox.textBox.config(state=DISABLED)
 
+        self.seed = int(self.seedEntry.get())
+
+        self.master.analysisBox.textBox.config(state=NORMAL)
+        self.master.analysisBox.textBox.insert('1.0', "Seed:"+str(self.seed))
+        self.master.analysisBox.textBox.config(state=DISABLED)
+
         #parses data to retrieve fields to input into processor
         self.rxnsAndMolCounts = (self.reactionText+self.moleculeText).splitlines()
         EqnsNmolCounts = CASSparser.parseText(self.rxnsAndMolCounts)
@@ -288,7 +293,7 @@ class runControl(LabelFrame):
         self.top = variablePicker(self)
         
         #Calls processor
-        self.master.graphBox.graph = CASSprocessor.updateAll(self.tupleInputs, self.molCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList)
+        self.master.graphBox.graph = CASSprocessor.updateAll(self.tupleInputs, self.molCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed)
         self.master.analysisBox.textBox.config(state=NORMAL)
         self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
         self.master.analysisBox.textBox.config(state=DISABLED)
@@ -305,6 +310,7 @@ class runControl(LabelFrame):
         self.seedLabel.grid(row = 0, column = 0)
 
         self.seedEntry = Entry(self, width = 20)
+        self.seedEntry.insert(0, self.seed)
         self.seedEntry.grid(row = 0, column = 1)
 
         self.runButton = Button(self, text = "Run", command = lambda: self.runSimulation(self.graph))
@@ -316,7 +322,8 @@ class runControl(LabelFrame):
                   tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=None):
         LabelFrame.__init__(self, master, text = "Run Control", padx = 5, pady = 5)
         self.master = master
-        
+
+        self.seed = 12341234
         self.duration = duration
         self.maxIterations = maxIterations
         self.rxnsAndMolCounts = rxnsAndMolCounts
@@ -381,14 +388,14 @@ class menuBar(Menu):
         #cycles through unimportant text until it finds the reactions
         while("Reactions" not in strList[index]):
             index+=1
-        #upon reaching the 'end', stops storing for reactionText
+        #upon reaching the '#', stops storing for reactionText
         while("#" not in strList[index+1]):
             index+=1
             reactionText = reactionText+strList[index]
         #cycles through unimportant text until it finds the molecule counts
-        while("Molecule Count of Reactants" not in strList[index]):
+        while("Molecule Count" not in strList[index]):
             index+=1
-        #upon reaching the 'end', stops storing for moleculeText
+        #upon reaching the '#', stops storing for moleculeText
         while("#" not in strList[index+1]):
             index+=1
             moleculeText = moleculeText+strList[index]
@@ -397,20 +404,20 @@ class menuBar(Menu):
         duration = 30
         maxIterations = 1000000
         outputFreq=1000
+        seed = 12341234
 
         optionalParams=[]
         #cycles through unimportant text until it finds the optional parameters
         while("Optional Parameters" not in strList[index]):
             index+=1
-        #upon reaching the 'end', stops storing for optionalParams and begins to strip its contents
+        #upon reaching the end of the list, stops storing for optionalParams and begins to strip its contents
         while(index<len(strList)-1):
             index+=1
             optionalParams.append(strList[index])
-            print(optionalParams)
         #strips through the optional params in order to find the values of the parameters
-        for i in range(3):
+        for i in range(4):
             for s in optionalParams[i].split('='):
-                if (s.rstrip()).isdigit():
+                if (s.strip()).isdigit():
                     value = int(s)
                     if(i==0):
                         duration=value
@@ -418,6 +425,8 @@ class menuBar(Menu):
                         maxIterations=value
                     if(i==2):
                         outputFreq=value
+                    if(i==3):
+                        seed = value
                     break
         #sets the forms to equal the parameters and text that it found
         self.master.app.inputBox.parametersBox.durationEntry.delete(0, 'end')
@@ -438,8 +447,9 @@ class menuBar(Menu):
         outputFreq = self.master.app.inputBox.parametersBox.outputFreqEntry.get()
         reactionText = self.master.app.inputBox.reactionsBox.textBox.get('1.0', 'end')
         moleculeText = self.master.app.inputBox.moleculesBox.textBox.get('1.0', 'end')
+        seed = str(self.master.app.outputBox.runBox.seedEntry.get())
 
-        saveText = "#Reactions\n"+reactionText+"\n#Molecule Count of Reactants\n"+moleculeText+"\n#Optional Parameters\n"+"duration="+duration+"\nmax_iterations="+maxIterations+"\noutput_freq="+outputFreq
+        saveText = "#Reactions\n"+reactionText+"\n#Molecule Count of Reactants\n"+moleculeText+"\n#Optional Parameters\n"+"duration="+duration+"\nmax_iterations="+maxIterations+"\noutput_freq="+outputFreq+"\nseed="+seed
         filename.write(saveText)
     def createWidgets(self):
         self.fileMenu = Menu(self, tearoff=0)
