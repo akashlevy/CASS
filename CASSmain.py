@@ -1,5 +1,5 @@
-import CASSparser, CASSprocessor, CASSoutput
-import sys, argparse
+import CASSparser, CASSprocessor, CASSoutput#, CASSgui
+import argparse
 
 CASSVersion = "1.0"
 
@@ -18,12 +18,13 @@ def main(argv=None):
     parser.add_argument("-ng", "--no-graphs", action = "store_true", help = "Don't display graphs after done processing (off by default)")
     parser.add_argument("-p", "--process", metavar = "FILE", help = "Specify a file to process")
     parser.add_argument("-s", "--silent", action = "store_true", help = "Don't display output while processing")
-    parser.add_argument("-sd", "--seed", metavar = "NUM", help = "Specify a seed to run the simulation with")
+    parser.add_argument("-sd", "--seed", metavar = "NUM", help = "Specify a random seed to run the simulation with")
     parser.add_argument("-v", "--version", action = "version", version = parser.prog + "_" + CASSVersion)
     args = parser.parse_args()
 
     if args.format_help:
         #Help on how to manually format your files
+        print
         print "Write equations in the following format (without < or >):"
         print "<Reactant1> + <Reactant2> + ... -> <Product1> + ... + <ProductN> [Reaction Rate]"
         print
@@ -34,7 +35,7 @@ def main(argv=None):
         print
         print "Specify molecules to plot against one another in the following format:"
         print "Plot <Reactant1> vs. <Reactant2>, <Reactant1> vs. <Time> ..."
-        sys.exit(0)
+        exit(0)
 
     elif args.interactive:
         #Welcome output
@@ -113,6 +114,6 @@ def main(argv=None):
 
     else:
         pass
-        #barry's gui()
+        #CASSgui.gui()
 
 main()
