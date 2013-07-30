@@ -7,7 +7,6 @@ from Tkinter import *
 import matplotlib
 matplotlib.use('TkAgg')
 
-from numpy import arange, sin, pi
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 # implement the default mpl key bindings
 from matplotlib.backend_bases import key_press_handler
@@ -15,11 +14,14 @@ from matplotlib.backend_bases import key_press_handler
 
 from matplotlib.figure import Figure
 
+#PRIORITY_TO_DO: Add molVSList dialog box
+#TO_DO: Add an Open file dialog box
+#TO_DO: Add About CASS and CASS Help pages
+#TO_DO: Remove submit buttons
+
 class Application(Frame):
     #top level frame containing everything
     
-    #, duration, maxIterations, rxnsAndMolCounts,
-    #             tupleInputs, molCounts, outputFreq, molVSList
     def createWidgets(self):
         self.inputBox = variableInput(self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.moleculeText, self.reactionText, self)
         self.inputBox.pack(side = "left", fill=Y)
@@ -110,10 +112,18 @@ class parameters(LabelFrame):
     #allows the user to input iterations, duration, output frequency, and plotted variables and pass them to the master
 
     def getInputData(self, iterationsEntry, durationEntry, outputFreqEntry):
+        #setting the maxIterations, outputFreq, and duration of the runBox
         self.master.master.outputBox.runBox.maxIterations = float(iterationsEntry.get())
         self.master.master.outputBox.runBox.outputFreq = float(outputFreqEntry.get())
         self.master.master.outputBox.runBox.duration = float(durationEntry.get())
-        
+
+        #setting the text of the analysis box to indicate the change
+        self.master.master.outputBox.analysisBox.textBox.config(state=NORMAL)
+        self.master.master.outputBox.analysisBox.textBox.insert('1.0', "Maximum Iterations:" + iterationsEntry.get()+"\n")
+        self.master.master.outputBox.analysisBox.textBox.insert('2.0', "Output Frequency:" + outputFreqEntry.get()+"\n")
+        self.master.master.outputBox.analysisBox.textBox.insert('3.0', "Duration:" + durationEntry.get()+"\n")
+        self.master.master.outputBox.analysisBox.textBox.config(state=DISABLED)
+
     def createWidgets(self):
         self.iterationsLabel = Label(self, text = "Iterations:")
         self.iterationsLabel.grid(row = 0, column = 0, sticky = 'W')
@@ -150,7 +160,13 @@ class molecules(LabelFrame):
     
     def submitMolecules(self, textBox):
         self.moleculeText = textBox.get('1.0', 'end')
+        #setting the moleculeText of the runBox
         self.master.master.outputBox.runBox.moleculeText = self.moleculeText
+        #setting the text of the analysis box to indicate the change
+        self.master.master.outputBox.analysisBox.textBox.config(state=NORMAL)
+        self.master.master.outputBox.analysisBox.textBox.insert('1.0', self.moleculeText)
+        self.master.master.outputBox.analysisBox.textBox.config(state=DISABLED)
+        
     def clearMolecules(self, textBox):
         textBox.delete('1.0', 'end')
         self.moleculeText = textBox.get('1.0', 'end')
@@ -179,7 +195,12 @@ class reactions(LabelFrame):
     
     def submitReactions(self, textBox):
         self.reactionText = textBox.get('1.0', 'end')
+        #setting the reactionText of the runBox
         self.master.master.outputBox.runBox.reactionText = self.reactionText
+        #setting the text of the analysis box to indicate the change
+        self.master.master.outputBox.analysisBox.textBox.config(state=NORMAL)
+        self.master.master.outputBox.analysisBox.textBox.insert('1.0', self.reactionText)
+        self.master.master.outputBox.analysisBox.textBox.config(state=DISABLED)
 
     def clearReactions(self, textBox):
         textBox.delete('1.0', 'end')
@@ -287,7 +308,7 @@ class analysis(LabelFrame):
         self.createWidgets()
 
 root = Tk()
-
+root.resizable(FALSE, FALSE)
 #default values
 duration = 30.0
 maxIterations = 1000000
@@ -303,13 +324,14 @@ graph = Figure(figsize = (5, 4), dpi=100)
 app = Application(duration, maxIterations, rxnsAndMolCounts,
                   tupleInputs, molCounts, outputFreq, molVSList, moleculeText, reactionText, graph, master=root)
 
+#creates the menu bar
 menuBar = Menu(root)
 
 fileMenu = Menu(menuBar, tearoff = 0)
 fileMenu.add_command(label = "Open")
 fileMenu.add_command(label = "Save")
 fileMenu.add_separator()
-fileMenu.add_command(label = "Exit", command = app.quit)
+fileMenu.add_command(label = "Exit", command = root.destroy)
 menuBar.add_cascade(label = "File", menu = fileMenu)
 
 helpMenu = Menu(menuBar, tearoff = 0)
