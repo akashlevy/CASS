@@ -59,7 +59,6 @@ def main(argv=None):
                     fileOK = True
                 except IOError:
                     print "Error - File does not exist"
-                    exit(1)
 
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots, seed = CASSparser.parseText(dataFile.readlines())
