@@ -1,11 +1,12 @@
+Tests
 Package
 Make work on different platforms
-Paper
-Presentation
-Tests
-Icons
 
 Remove command line shit
 
 Threading
 Progress Bar
+Make GUI use regex to parse input file
+
+Paper
+Presentation
