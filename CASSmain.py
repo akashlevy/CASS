@@ -67,7 +67,7 @@ def main(argv=None):
 
         #If error, display and exit
         if error != None:
-            print error.string
+            print error
             print
             print "The program will now exit."
             exit(1)
@@ -106,7 +106,7 @@ def main(argv=None):
 
         #If error, display and exit
         if error != None:
-            print error.string
+            print error
             print
             print "The program will now exit."
             exit(1)
