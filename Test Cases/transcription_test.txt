@@ -13,4 +13,5 @@ M=0
 duration=10000000
 max_iterations=10000
 output_freq=1000
+seed = 12341234
 Plot P vs. time
