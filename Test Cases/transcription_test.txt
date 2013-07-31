@@ -10,7 +10,7 @@ D=1
 M=0
 
 #Optional Parameters
-duration=10000000 default = 1000000
-max_iterations=10000 default = 10000000
-output_freq=1000 default = 10000
+duration=10000000
+max_iterations=10000
+output_freq=1000
 Plot P vs. time
