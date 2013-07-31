@@ -523,6 +523,7 @@ class menuBar(Menu):
 def main():  
     root = Tk()
     root.resizable(FALSE, FALSE)
+    root.wm_iconbitmap('CASS_Icon_Sq.ico')
     #Default values
     duration = 30.0
     maxIterations = 1000000
