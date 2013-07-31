@@ -289,7 +289,7 @@ class runControl(LabelFrame):
             #Calls processor
             if(self.matchInputs() == False):
                 #The data is only processed if it is different than the previous entry
-                (self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix) = CASSprocessor.updateAll(self.tupleInputs, self.processedMolCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed, True)
+                (self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix) = CASSprocessor.updateAll(self.tupleInputs, self.processedMolCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed)
                 self.prevSeed = self.seed
                 self.prevDuration = self.duration
                 self.prevMaxIterations = self.maxIterations
