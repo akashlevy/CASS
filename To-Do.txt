@@ -4,6 +4,8 @@ Paper
 Presentation
 Tests
 Icons
-Threading
+
 Remove command line shit
+
+Threading
 Progress Bar
