@@ -1,15 +1,5 @@
-#Import regular expression library and sys for exit()
+#Import regular expression library
 import re
-
-#Exception that is raised when an error is found during parsing
-class ParsingSyntaxError(Exception):
-    def __init__(self, string, exitMode):
-        #Print error message
-        print string
-        print
-        if exitMode:
-            print "The program will now exit."
-            exit(1)
 
 #Check if all characters are matched
 def notAllMatched(inputString, matches):
@@ -33,7 +23,7 @@ def notAllMatched(inputString, matches):
     return allFound           
     
 #Text parsing function
-def parseText(inputStrings, exitMode = True):
+def parseText(inputStrings):
     #Define lists and dictionaries we want to return
     moleCounts = {}
     equations = []
@@ -121,8 +111,7 @@ def parseText(inputStrings, exitMode = True):
             try:
                 line = line.replace(match.group(1), str(eval(match.group(1))))
             except Exception as e:
-                print "ERROR: " + e.args[0]
-                exit(1)
+                return None, None, None, None, None, None, None, "ERROR: " + e.args[0]
             
         #Define outputs
         reactants = {}
@@ -142,15 +131,15 @@ def parseText(inputStrings, exitMode = True):
 
         #Check for errors
         if len(eqArrowMatches) > 1:
-            raise ParsingSyntaxError("ERROR: The parser found more than one arrow in line " + str(i+1) + ":\n" + line, exitMode)        
+            return None, None, None, None, None, None, None, "ERROR: The parser found more than one arrow in line " + str(i+1) + ":\n" + line
         if len(eqEndMatches) > 1:
-            raise ParsingSyntaxError("ERROR: The parser found more than one equation terminator in line (you may be missing a '+') " + str(i+1) + ":\n" + line, exitMode)
+            return None, None, None, None, None, None, None, "ERROR: The parser found more than one equation terminator in line (you may be missing a '+') " + str(i+1) + ":\n" + line
         if len(eqConstantMatches) > 1:
-            raise ParsingSyntaxError("ERROR: The parser found more than one reaction constant in line " + str(i+1) + ":\n" + line, exitMode)
+            raise "ERROR: The parser found more than one reaction constant in line " + str(i+1) + ":\n" + line
         if len(declarationMatches) > 1:
-            raise ParsingSyntaxError("ERROR: The parser found more than one equal sign in line " + str(i+1) + ":\n" + line, exitMode)
+            return None, None, None, None, None, None, None, "ERROR: The parser found more than one equal sign in line " + str(i+1) + ":\n" + line
         if len(plotMatches) > 1:
-            raise ParsingSyntaxError("ERROR: The parser found more than one PLOT command in line " + str(i+1) + ":\n" + line, exitMode)
+            return None, None, None, None, None, None, None, "ERROR: The parser found more than one PLOT command in line " + str(i+1) + ":\n" + line
         
         #Figure out whether the line is a reaction, molecule count or plot
         lineType = ""
@@ -158,16 +147,16 @@ def parseText(inputStrings, exitMode = True):
             lineType = "plot"
         if len(eqConstantMatches) == 1 and len(eqArrowMatches) == 1:
             if lineType != "":
-                 raise ParsingSyntaxError("ERROR: Ambiguous line type for line " + str(i+1) + ":\n" + line, exitMode)
+                 return None, None, None, None, None, None, None, "ERROR: Ambiguous line type for line " + str(i+1) + ":\n" + line
             else:
                 lineType = "equation"
         if len(declarationMatches) == 1:
             if lineType != "":
-                raise ParsingSyntaxError("ERROR: Ambiguous line type for line " + str(i+1) + ":\n" + line, exitMode)
+                return None, None, None, None, None, None, None, "ERROR: Ambiguous line type for line " + str(i+1) + ":\n" + line
             else:
                 lineType = "declaration"
         if lineType == "":
-            raise ParsingSyntaxError("ERROR: Could not identify line type for line " + str(i+1) + ":\n" + line, exitMode)
+            return None, None, None, None, None, None, None, "ERROR: Could not identify line type for line " + str(i+1) + ":\n" + line
                 
         #Make sure all characters are matched, otherwise warn the user
         notMatchedData = notAllMatched(line, eqPlusMatches + eqArrowMatches + eqEndMatches + eqConstantMatches + declarationMatches + plotMatches + plotArgsMatches)
@@ -183,7 +172,7 @@ def parseText(inputStrings, exitMode = True):
                 #Set the constant equal to the match that was found
                 constant = float(eqConstantMatches[0].group(1))
             except ValueError:   
-                raise ParsingSyntaxError("ERROR: The parser was unable to read the molecule count in line " + str(i+1) + ":\n" + line, exitMode)
+                return None, None, None, None, None, None, None, "ERROR: The parser was unable to read the molecule count in line " + str(i+1) + ":\n" + line
             for match in (eqArrowMatches + eqPlusMatches + eqEndMatches):
                 #If coefficient is not found, then set it equal to one
                 if match.group(1) == '' or match.group(1) == None:
@@ -212,29 +201,29 @@ def parseText(inputStrings, exitMode = True):
             try:
                 moleCount = float(declarationMatches[0].group(2))
             except ValueError as e:
-                raise ParsingSyntaxError("ERROR: The parser was unable to read the molecule count in line " + str(i+1) + ":\n" + line + "The error was: " + e.args[0], exitMode)
+                return None, None, None, None, None, None, None, "ERROR: The parser was unable to read the molecule count in line " + str(i+1) + ":\n" + line + "The error was: " + e.args[0]
             elementName = declarationMatches[0].group(1)
             if elementName == "duration":
                 duration = moleCount
                 if duration <= 0:
-                    raise ParsingSyntaxError("ERROR: The duration specified in line " + str(i+1) + "must be positive:\n" + line, exitMode)
+                    return None, None, None, None, None, None, None, "ERROR: The duration specified in line " + str(i+1) + "must be positive:\n" + line
             elif elementName == "max_iterations":
                 max_iterations = moleCount
                 if max_iterations <= 0:
-                    raise ParsingSyntaxError("ERROR: The maximum iterations specified in line " + str(i+1) + "must be positive:\n" + line, exitMode)
+                    return None, None, None, None, None, None, None, "ERROR: The maximum iterations specified in line " + str(i+1) + "must be positive:\n" + line
             elif elementName == "seed":
                 seed = moleCount
             elif elementName == "output_freq":
                 output_freq = moleCount
                 if output_freq <= 0:
-                    raise ParsingSyntaxError("ERROR: The output frequency specified in line " + str(i+1) + "must be positive:\n" + line, exitMode)
+                    return None, None, None, None, None, None, None, "ERROR: The output frequency specified in line " + str(i+1) + "must be positive:\n" + line
             else:
                 if moleCount < 0:
-                    raise ParsingSyntaxError("ERROR: The molecule count in line " + str(i+1) + "is negative:\n" + line, exitMode)
+                    return None, None, None, None, None, None, None, "ERROR: The molecule count in line " + str(i+1) + "is negative:\n" + line
                 moleCounts[elementName] = moleCount
         elif lineType == "plot":
             #Create list of plots
             for match in plotArgsMatches:
                 plots.append([match.group(1), match.group(2)])
     
-    return equations, moleCounts, duration, max_iterations, output_freq, plots, seed
+    return equations, moleCounts, duration, max_iterations, output_freq, plots, seed, None

@@ -13,15 +13,6 @@ import CASSoutput
     #"molVSList" = a list of tuples of strings representing the molecules/time to be plotted against each other
     #"inputName" = a string representing the name of the input file
 
-class ProcessingError(Exception):
-    def __init__(self, string, exitMode):
-        #Print error message
-        print string
-        if exitMode:
-            print
-            print "The program will now exit."
-            exit(1)
-
 def updateAll(tupleInputs, molCounts, maxTime, maxIterations, outputFreq, molVSList, seed=1234213, silent=False):
     #Initialize variables
     rng.seed(seed)

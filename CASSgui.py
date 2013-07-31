@@ -1,12 +1,11 @@
 import CASSparser, CASSprocessor, CASSoutput
 import webbrowser, copy, sys, os, tkFileDialog, matplotlib
 
-from Tkinter import *
-matplotlib.use('TkAgg')
-
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+from Tkinter import *
+matplotlib.use('TkAgg')
 
 class Application(Frame):
     #Top level frame containing everything
@@ -252,7 +251,6 @@ class runControl(LabelFrame):
 
     def runSimulation(self, graph):
         #Parses the inputs and runs the actual reaction
-        
         #Retrieves data from the entry fields
         self.maxIterations = float(self.master.master.inputBox.parametersBox.iterationsEntry.get())
         self.duration = float(self.master.master.inputBox.parametersBox.durationEntry.get())
@@ -270,11 +268,17 @@ class runControl(LabelFrame):
         EqnsNmolCounts = CASSparser.parseText(self.rxnsAndMolCounts)
         self.tupleInputs = EqnsNmolCounts[0]
         self.molCounts = EqnsNmolCounts[1]
+        error = EqnsNmolCounts[7]
         self.processedMolCounts = copy.deepcopy(self.molCounts) #this copy is because molCounts is supposed to be pased into the processor, but because it is a
                                                                 #dict, only a reference is passed, so all changes done are done to molCount as well.
                                                                 #In order to store the values of molCounts, a copy must be passed into the processor instead
-
-        self.top = variablePicker(self)
+        if error != None:
+            self.runProcessor = False
+            self.master.analysisBox.textBox.config(state=NORMAL)
+            self.master.analysisBox.textBox.insert('1.0', error + "\n")
+            self.master.analysisBox.textBox.config(state=DISABLED)
+        else:
+            self.top = variablePicker(self)
 
         if(self.runProcessor):
             self.master.analysisBox.textBox.config(state=NORMAL)
@@ -289,7 +293,7 @@ class runControl(LabelFrame):
             #Calls processor
             if(self.matchInputs() == False):
                 #The data is only processed if it is different than the previous entry
-                (self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix) = CASSprocessor.updateAll(self.tupleInputs, self.processedMolCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed)
+                (self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix) = CASSprocessor.updateAll(self.tupleInputs, self.processedMolCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed, True)
                 self.prevSeed = self.seed
                 self.prevDuration = self.duration
                 self.prevMaxIterations = self.maxIterations
@@ -380,7 +384,6 @@ class graphDisplay(Frame):
         
 class analysis(LabelFrame):
     #Outputs text such as error messages
-    
     def createWidgets(self):
         self.textBox = Text(self, width = 60, height = 5)
         self.textBox.config(state = DISABLED)

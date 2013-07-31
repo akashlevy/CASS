@@ -63,7 +63,14 @@ def main(argv=None):
                     print "Error - File does not exist"
 
         #Calls parser        
-        equations, moleCounts, duration, max_iterations, output_freq, plots, seed = CASSparser.parseText(dataFile.readlines())
+        equations, moleCounts, duration, max_iterations, output_freq, plots, seed, error = CASSparser.parseText(dataFile.readlines())
+
+        #If error, display and exit
+        if error != None:
+            print error.string
+            print
+            print "The program will now exit."
+            exit(1)
         
         #Override file specifications based on input arguments
         if args.no_graphs:
@@ -95,7 +102,14 @@ def main(argv=None):
                 exit(1)
 
         #Calls parser        
-        equations, moleCounts, duration, max_iterations, output_freq, plots, seed = CASSparser.parseText(dataFile.readlines())
+        equations, moleCounts, duration, max_iterations, output_freq, plots, seed, error = CASSparser.parseText(dataFile.readlines())
+
+        #If error, display and exit
+        if error != None:
+            print error.string
+            print
+            print "The program will now exit."
+            exit(1)
 
         #Override file specifications based on input arguments
         if args.no_graphs:
