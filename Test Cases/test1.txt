@@ -13,8 +13,8 @@ co2 = 10000
 sucrose = 2.5e+8
 
 #Optional Parameters
-duration=(Insert Duration [secs]) default = 100
-max_iterations=(Insert Max Number of Iterations) default = 1000000
-output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 10000
+duration=(Insert Duration [secs])
+max_iterations=(Insert Max Number of Iterations)
+output_freq=(Insert Print Output Frequency [print every "n" iterations])
 seed = 12341234
 Plot sucrose vs. glucose, h2 vs. air, water vs. time
