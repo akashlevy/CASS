@@ -5,4 +5,5 @@ Presentation
 Tests
 Icons
 Threading
+Remove command line shit
 Progress Bar
