@@ -283,7 +283,7 @@ class runControl(LabelFrame):
             self.master.analysisBox.textBox.insert('3.0', "Duration:" + str(self.duration)+"\n")
             self.master.analysisBox.textBox.insert('1.0', self.moleculeText)
             self.master.analysisBox.textBox.insert('1.0', self.reactionText)
-            self.master.analysisBox.textBox.insert('1.0', "Seed:"+str(self.seed)+"\n")
+            self.master.analysisBox.textBox.insert('1.0', "Seed:"+str(self.seed))
             self.master.analysisBox.textBox.config(state=DISABLED)
             
             #Calls processor
@@ -297,7 +297,7 @@ class runControl(LabelFrame):
                 self.prevMolCounts = self.molCounts
                 self.prevOutputFreq = self.outputFreq
                 self.master.analysisBox.textBox.config(state=NORMAL)
-                self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete\n')
+                self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
                 self.master.analysisBox.textBox.config(state=DISABLED)
             #If it is the same as the previous entry, then it has already been processed, so graph just uses the data that was already made
             self.master.graphBox.graph.clf()
