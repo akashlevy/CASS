@@ -1,9 +1,12 @@
+#Reactions
 C14 -> N + e [0.0001210]
 
+#Molecule Count of Reactants
 C14=1000000
 N=0
 e=0
 
+#Optional Parameters
 duration=100000
 max_iterations=1000000000
 output_freq=10000
