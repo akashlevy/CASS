@@ -1,4 +1,6 @@
 import CASSparser, CASSprocessor, CASSoutput
+import webbrowser
+import copy
 
 from Tkinter import *
 import tkFileDialog
@@ -229,7 +231,6 @@ class variablePicker(Toplevel):
         yAxisLabel.grid(row = 0, column = 1)
         
         for key in self.master.molCounts.keys():
-            print(counter)
             radioList1[counter] = Radiobutton(molListChooserFrame, text = key, variable = xAxis, value = key)
             radioList1[counter].grid(row = counter+1, column = 0, sticky = 'W')
             radioList2[counter] = Radiobutton(molListChooserFrame, text = key, variable = yAxis, value = key)
@@ -243,7 +244,7 @@ class variablePicker(Toplevel):
         submitButton = Button(molListChooserFrame, text = "Submit", command=lambda: self.submitVariables(xAxis, yAxis))
         submitButton.grid(row=counter+2, column = 0, sticky = 'W')
         cancelButton = Button(molListChooserFrame, text = "Cancel", command=self.cancelChoice)
-        cancelButton.grid(row=counter+2, column = 0, sticky = 'E')
+        cancelButton.grid(row=counter+2, column = 1, sticky = 'W')
         molListChooserFrame.pack()
 
         #prevents the window from closing immediately
@@ -279,6 +280,9 @@ class runControl(LabelFrame):
         EqnsNmolCounts = CASSparser.parseText(self.rxnsAndMolCounts)
         self.tupleInputs = EqnsNmolCounts[0]
         self.molCounts = EqnsNmolCounts[1]
+        self.processedMolCounts = copy.deepcopy(self.molCounts) #this copy is because molCounts is supposed to be pased into the processor, but because it is a
+                                                                #dict, only a reference is passed, so all changes done are done to molCount as well.
+                                                                #In order to store the values of molCounts, a copy must be passed into the processor instead
 
         self.top = variablePicker(self)
 
@@ -293,15 +297,34 @@ class runControl(LabelFrame):
             self.master.analysisBox.textBox.config(state=DISABLED)
             
             #Calls processor
-            self.master.graphBox.graph = CASSprocessor.updateAll(self.tupleInputs, self.molCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed)
-            self.master.analysisBox.textBox.config(state=NORMAL)
-            self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
-            self.master.analysisBox.textBox.config(state=DISABLED)
+            if(self.matchInputs() == False):
+                #The data is only processed if it is different than the previous entry
+                (self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix) = CASSprocessor.updateAll(self.tupleInputs, self.processedMolCounts, self.duration, self.maxIterations, self.outputFreq, self.molVSList, self.seed)
+                self.prevSeed = self.seed
+                self.prevDuration = self.duration
+                self.prevMaxIterations = self.maxIterations
+                self.prevTupleInputs = self.tupleInputs
+                self.prevMolCounts = self.molCounts
+                self.prevOutputFreq = self.outputFreq
+                self.master.analysisBox.textBox.config(state=NORMAL)
+                self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
+                self.master.analysisBox.textBox.config(state=DISABLED)
+            #If it is the same as the previous entry, then it has already been processed, so graph just uses the data that was already made
+            self.master.graphBox.graph.clf()
+            self.master.graphBox.graph = CASSoutput.graphResults(self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix)
             self.master.graphBox.destroyWidgets()
             self.master.graphBox.createWidgets()
 
+    def matchInputs(self):
+        #This checks to ensure whether or not the input values are the same as the previous input values
+        if(self.seed == self.prevSeed and self.duration == self.prevDuration and self.maxIterations == self.prevMaxIterations 
+           and self.tupleInputs == self.prevTupleInputs and self.molCounts == self.prevMolCounts and self.outputFreq == self.prevOutputFreq):
+            return True
+        else:
+            return False
+        
     def clearSimulation(self):
-        self.master.graphBox.graph = Figure(figsize = (5, 4), dpi=100)
+        self.master.graphBox.graph.clf()
         self.master.graphBox.destroyWidgets()
         self.master.graphBox.createWidgets()
 
@@ -335,6 +358,9 @@ class runControl(LabelFrame):
         self.reactionText = reactionText
         self.graph = graph
         self.runProcessor = False #determines whether or not the graph is actually created and data is actually organized
+
+        self.prevSeed = self.prevDuration = self.prevMaxIterations = self.prevTupleInputs = self.prevMolCounts = \
+        self.prevOutputFreq = self.fileHandles = self.molCounts = self.molVSList = self.suffix = 0
         
         self.createWidgets()
 
@@ -452,6 +478,23 @@ class menuBar(Menu):
 
         saveText = "#Reactions\n"+reactionText+"\n#Molecule Count of Reactants\n"+moleculeText+"\n#Optional Parameters\n"+"duration="+duration+"\nmax_iterations="+maxIterations+"\noutput_freq="+outputFreq+"\nseed="+seed
         filename.write(saveText)
+
+    def helpPage(self):
+        webbrowser.open_new('https://github.com/akashlevy/CASS/wiki/Computational-Adaptable-Stochastic-Simulator-(CASS)')
+
+    def deleteAboutPage(self):
+        self.top.destroy()
+    def aboutPage(self):
+        self.top = Toplevel(self)
+        self.top.title("About CASS")
+        self.top.resizable(FALSE, FALSE)
+        self.aboutFrame = Frame(self.top, padx = 30, pady = 30)
+        self.aboutFrame.pack()
+        aboutLabel = Label(self.aboutFrame, text = "Computational Adaptable Stochastic Simulator\nVersion: " + str(self.master.app.version))
+        aboutLabel.pack()
+        okButton = Button(self.aboutFrame, text = "OK", command = self.deleteAboutPage)
+        okButton.pack()
+        
     def createWidgets(self):
         self.fileMenu = Menu(self, tearoff=0)
         self.fileMenu.add_command(label = "Open", command = self.askFile)
@@ -461,9 +504,9 @@ class menuBar(Menu):
         self.add_cascade(label = "File", menu = self.fileMenu)
 
         self.helpMenu = Menu(self, tearoff = 0)
-        self.helpMenu.add_command(label = "About CASS")
+        self.helpMenu.add_command(label = "About CASS", command = self.aboutPage)
         self.helpMenu.add_separator()
-        self.helpMenu.add_command(label = "CASS Help")
+        self.helpMenu.add_command(label = "CASS Help", command = self.helpPage)
         self.add_cascade(label = "Help", menu = self.helpMenu)
         
         self.master.config(menu=self)
