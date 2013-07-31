@@ -31,7 +31,7 @@ def graphResults(fileHandles, molCounts, molVSList, suffix, avgOn=False, silent=
                 listy=listTime
             else:
                 listy=readIn("%s.dat"% yN, suffix)
-            title1="%s vs. %s"%(xN,yN)
+            title1="%s vs. %s"%(yN,xN)
             pylab.title(title1)              
             if(yN.lower()=="time"):
                 pylab.plot(listy,listx)
