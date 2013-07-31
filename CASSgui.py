@@ -5,7 +5,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 from Tkinter import *
-matplotlib.use('TkAgg')
 
 class Application(Frame):
     #Top level frame containing everything
