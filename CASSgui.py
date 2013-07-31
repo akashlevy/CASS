@@ -494,7 +494,7 @@ class menuBar(Menu):
         okButton.pack()
         
     def quitProgram(self):
-        self.master.destroy
+        self.master.destroy()
         exit(0)
         
     def createWidgets(self):
