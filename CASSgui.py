@@ -487,7 +487,7 @@ class menuBar(Menu):
         self.top.resizable(FALSE, FALSE)
         self.aboutFrame = Frame(self.top, padx = 30, pady = 30)
         self.aboutFrame.pack()
-        logo = PhotoImage(file = 'CASS_Logo1.gif')
+        logo = PhotoImage(file = 'CASSlogo.gif')
         logoLabel = Label(self.aboutFrame, image = logo)
         logoLabel.image = logo
         logoLabel.pack()
@@ -523,7 +523,7 @@ class menuBar(Menu):
 def main():  
     root = Tk()
     root.resizable(FALSE, FALSE)
-    root.wm_iconbitmap('CASS_Icon_Sq.ico')
+    root.wm_iconbitmap('CASSicon.ico')
     #Default values
     duration = 30.0
     maxIterations = 1000000
