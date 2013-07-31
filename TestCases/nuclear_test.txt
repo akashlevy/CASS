@@ -1,9 +1,10 @@
-C14 -> [1]
- -> [180825048000]
+C14 -> N + e [0.0001210]
 
-C14=1000000000000
+C14=1000000
+N=0
+e=0
 
-duration=(Insert Duration [secs]) default = 100000
-max_iterations=(Insert Max Number of Iterations) default = 1000000000
-output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 10000
+duration=100000
+max_iterations=1000000000
+output_freq=10000
 Plot C14 vs. time
