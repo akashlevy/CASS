@@ -488,7 +488,11 @@ class menuBar(Menu):
         self.top.resizable(FALSE, FALSE)
         self.aboutFrame = Frame(self.top, padx = 30, pady = 30)
         self.aboutFrame.pack()
-        aboutLabel = Label(self.aboutFrame, text = "Computational Adaptable Stochastic Simulator\nVersion: " + str(self.master.app.version))
+        logo = PhotoImage(file = 'CASS_Logo1.gif')
+        logoLabel = Label(self.aboutFrame, image = logo)
+        logoLabel.image = logo
+        logoLabel.pack()
+        aboutLabel = Label(self.aboutFrame, text = "Created by Cameron Breze, Michael Becich, Akash Levy,\nJulie Baldassano, Barry Li, Seth Wilson, and Nada Bader\n\nComputational Adaptable Stochastic Simulator\nVersion: " + str(self.master.app.version))
         aboutLabel.pack()
         okButton = Button(self.aboutFrame, text = "OK", command = self.deleteAboutPage)
         okButton.pack()
