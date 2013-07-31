@@ -146,7 +146,7 @@ def parseText(inputStrings):
         if len(plotMatches) == 1 and len(plotArgsMatches) >= 1:
             lineType = "plot"
         if len(eqArrowMatches) == 1:
-            if len(eqConstantMatches) == 1:
+            if len(eqConstantMatches) == 0:
                 return None, None, None, None, None, None, None, "ERROR: No reaction constant found in line " + str(i+1) + ":\n" + line
             if lineType != "":
                 return None, None, None, None, None, None, None, "ERROR: Ambiguous line type for line " + str(i+1) + ":\n" + line
