@@ -220,6 +220,10 @@ class variablePicker(Toplevel):
         yAxisLabel.grid(row = 0, column = 1)
         
         for key in self.master.molCounts.keys():
+            #Sets them so the radiobuttons are not created incorrectly selected
+            if(counter == 0):
+                xAxis.set(key)
+                yAxis.set(key)
             radioList1[counter] = Radiobutton(molListChooserFrame, text = key, variable = xAxis, value = key)
             radioList1[counter].grid(row = counter+1, column = 0, sticky = 'W')
             radioList2[counter] = Radiobutton(molListChooserFrame, text = key, variable = yAxis, value = key)
@@ -477,6 +481,7 @@ class menuBar(Menu):
 
     def deleteAboutPage(self):
         self.top.destroy()
+        
     def aboutPage(self):
         self.top = Toplevel(self)
         self.top.title("About CASS")
@@ -488,12 +493,16 @@ class menuBar(Menu):
         okButton = Button(self.aboutFrame, text = "OK", command = self.deleteAboutPage)
         okButton.pack()
         
+    def quitProgram(self):
+        self.master.destroy
+        exit(0)
+        
     def createWidgets(self):
         self.fileMenu = Menu(self, tearoff=0)
         self.fileMenu.add_command(label = "Open", command = self.askFile)
         self.fileMenu.add_command(label = "Save", command = self.saveFile)
         self.fileMenu.add_separator()
-        self.fileMenu.add_command(label = "Exit", command = self.master.destroy)
+        self.fileMenu.add_command(label = "Exit", command = self.quitProgram)
         self.add_cascade(label = "File", menu = self.fileMenu)
 
         self.helpMenu = Menu(self, tearoff = 0)
