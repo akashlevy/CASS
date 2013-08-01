@@ -76,22 +76,28 @@ def avgPlot(listx, listy):
 
 #Reads the created files for plotting (specific for time variable)
 def readInTime(fileName, suffix):
-    list1=[]
-    path = str(os.getcwd()) + "\\Results_" + suffix
-    fileDir=os.path.join(path,fileName)
-    file = open(fileDir,"r")
-    for line in file.readlines():
-        if "Time" not in line:
-            list1.append(line.split(" ",1)[0])   
-    return list1
+    try:
+        list1=[]
+        path = str(os.getcwd()) + "\\Results_" + suffix
+        fileDir=os.path.join(path,fileName)
+        file = open(fileDir,"r")
+        for line in file.readlines():
+            if "Time" not in line:
+                list1.append(line.split(" ",1)[0])   
+        return list1
+    except IOError:
+        return []
                 
 #Reads the created files for plotting
 def readIn(fileName, suffix):
-    list1=[]
-    path = str(os.getcwd()) + "\\Results_" + suffix
-    fileDir=os.path.join(path,fileName)
-    file = open(fileDir,"r")
-    for line in file.readlines():
-        if "Time" not in line:
-            list1.append(line.split(" ",1)[1])   
-    return list1
+    try:
+        list1=[]
+        path = str(os.getcwd()) + "\\Results_" + suffix
+        fileDir=os.path.join(path,fileName)
+        file = open(fileDir,"r")
+        for line in file.readlines():
+            if "Time" not in line:
+                list1.append(line.split(" ",1)[1])   
+        return list1
+    except IOError:
+        return []

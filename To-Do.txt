@@ -1,12 +1,13 @@
 Tests
 Package
 Make work on different platforms
+Wiki - H(1+1)O example
 
 Remove command line shit
 
 Threading
 Progress Bar
 Make GUI use regex to parse input file
+Fix crash error
 
 Paper
-Presentation

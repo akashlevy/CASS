@@ -285,12 +285,12 @@ class runControl(LabelFrame):
 
         if(self.runProcessor):
             self.master.analysisBox.textBox.config(state=NORMAL)
-            self.master.analysisBox.textBox.insert('1.0', "Maximum Iterations:" + str(self.maxIterations)+"\n")
-            self.master.analysisBox.textBox.insert('2.0', "Output Frequency:" + str(self.outputFreq)+"\n")
-            self.master.analysisBox.textBox.insert('3.0', "Duration:" + str(self.duration)+"\n")
+            self.master.analysisBox.textBox.insert('1.0', "Maximum Iterations: " + str(self.maxIterations) + "\n")
+            self.master.analysisBox.textBox.insert('2.0', "Output Frequency: " + str(self.outputFreq) + "\n")
+            self.master.analysisBox.textBox.insert('3.0', "Duration: " + str(self.duration) + "\n")
             self.master.analysisBox.textBox.insert('1.0', self.moleculeText)
             self.master.analysisBox.textBox.insert('1.0', self.reactionText)
-            self.master.analysisBox.textBox.insert('1.0', "Seed:"+str(self.seed))
+            self.master.analysisBox.textBox.insert('1.0', "Seed: " + str(self.seed))
             self.master.analysisBox.textBox.config(state=DISABLED)
             
             #Calls processor
@@ -304,11 +304,11 @@ class runControl(LabelFrame):
                 self.prevMolCounts = self.molCounts
                 self.prevOutputFreq = self.outputFreq
                 self.master.analysisBox.textBox.config(state=NORMAL)
-                self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete')
+                self.master.analysisBox.textBox.insert('1.0', 'Simulation Complete\n')
                 self.master.analysisBox.textBox.config(state=DISABLED)
             #If it is the same as the previous entry, then it has already been processed, so graph just uses the data that was already made
             self.master.graphBox.graph.clf()
-            self.master.graphBox.graph = CASSoutput.graphResults(self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix)
+            self.master.graphBox.graph = CASSoutput.graphResults(self.fileHandles, self.processedMolCounts, self.molVSList, self.suffix, False, True)
             self.master.graphBox.destroyWidgets()
             self.master.graphBox.createWidgets()
 
@@ -497,8 +497,11 @@ class menuBar(Menu):
         okButton.pack()
         
     def quitProgram(self):
-        self.master.destroy()
-        exit(0)
+        try:
+            self.master.destroy()
+            exit(0)
+        except Exception:
+            exit(0)
         
     def createWidgets(self):
         self.fileMenu = Menu(self, tearoff=0)

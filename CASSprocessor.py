@@ -1,5 +1,4 @@
 import math, os, numpy, pylab, datetime, time as tm, random as rng
-import CASSoutput
 
 #Input Data Structure
     #"tupleInputs" = list of Tuples (each tuple represents a reaction)
