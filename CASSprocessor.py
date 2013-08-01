@@ -105,20 +105,24 @@ def computePropensity(tupleInput, molCounts):
                 if (coeffs[key] > 0):
                     #Multiplied by permutation of molCounts for each reactant molecule divided by the coefficient
                     #(e.g. The propensity of reactants 3A + 2B is: (1/3*(N_A)*(N_A-1)*(N_A-2))*(1/2*(N_B)*(N_B-1)))
-                    propProduct *= (1.0*calcNPR(molCounts[key],coeffs[key])*(1.0/(coeffs[key])))
+                    propProduct *= (1.0*calcNCR(molCounts[key],coeffs[key]))
                 break
             except KeyError:
                 raise ProcessingError("ERROR - %s is not in the molecule list"%(key))
     return propProduct
 
-#Takes two integers n and r, and returns the permutation: nPr (i.e. P(n,r))
+#Takes two integers n and r, and returns the number of combinations: nCr (i.e. C(n,r))
 #Returns 0 if r > n
-def calcNPR(n,r):
+def calcNCR(n,r):
     product=1
+    temp = r
     while(r>0):
         product*=n
         n-=1
         r-=1
+    while(temp>0):
+        product=product/temp
+        temp-=1
     return product
 
 #Takes one dictionary of a reaction and adds the difference for each molecule according to the reaction
