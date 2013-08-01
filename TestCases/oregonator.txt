@@ -1,0 +1,22 @@
+#Reactions
+A + Y -> X [656]
+X + Y -> P [52224]
+B + X -> 2X + Z [32768]
+2X -> Q [10496]
+C -> Y [8192]
+
+#Molecule Count of Reactants
+A = 1000
+B = 1000
+C = 1000
+X = 500
+Y = 1000
+Z = 2000
+P = 0
+Q = 0
+
+#Optional Parameters
+duration=100000
+max_iterations=1000000000
+output_freq=10000
+Plot P vs. Q
