@@ -103,6 +103,14 @@ def main(argv=None):
 
         #Calls parser        
         equations, moleCounts, duration, max_iterations, output_freq, plots, seed, error = CASSparser.parseText(dataFile.readlines())
+        print equations
+        print moleCounts
+        print duration
+        print max_iterations
+        print output_freq
+        print plots
+        print seed
+        print error
 
         #If error, display and exit
         if error != None:

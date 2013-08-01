@@ -8,8 +8,8 @@ R = 2000
 W = 1000
 
 #Optional Parameters
-duration=(Insert Duration [secs]) default = 10
-max_iterations=(Insert Max Number of Iterations) default = 100000
-output_freq=(Insert Print Output Frequency [print every "n" iterations]) default = 1000
+duration=10
+max_iterations=100000
+output_freq=1000
 seed = 12341234
 Plot R vs. W, W vs. R
